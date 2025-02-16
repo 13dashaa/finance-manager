@@ -2,16 +2,19 @@ package com.example.finance_manager.controller;
 
 import com.example.finance_manager.models.Budget;
 import com.example.finance_manager.service.BudgetService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 @RestController
 @RequestMapping("/budget")
 public class BudgetController {
-    @Autowired
-    private BudgetService budgetService;
+    private final BudgetService budgetService;
+
+
+    public BudgetController(BudgetService budgetService) {
+        this.budgetService = budgetService;
+    }
 
     @PostMapping
     public ResponseEntity<Budget> createBudget(@RequestBody Budget budget) {

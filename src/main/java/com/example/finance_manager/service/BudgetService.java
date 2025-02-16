@@ -2,7 +2,6 @@ package com.example.finance_manager.service;
 
 import com.example.finance_manager.models.Budget;
 import com.example.finance_manager.repository.BudgetRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,8 +9,14 @@ import java.util.Optional;
 
 @Service
 public class BudgetService {
-    @Autowired
+
+
     private BudgetRepository budgetRepository;
+
+    public BudgetService(BudgetRepository budgetRepository) {
+        this.budgetRepository = budgetRepository;
+    }
+
     public void addBudget(Budget budget) {
         budgetRepository.addBudget(budget);
     }

@@ -2,7 +2,6 @@ package com.example.finance_manager.controller;
 
 import com.example.finance_manager.models.Transaction;
 import com.example.finance_manager.service.TransactionService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,13 +11,18 @@ import java.util.List;
 @RestController
 @RequestMapping("transactions")
 public class TransactionController {
-    @Autowired
+
     private TransactionService transactionService;
+
+    public TransactionController(TransactionService transactionService) {
+        this.transactionService = transactionService;
+    }
 
     @PostMapping
     public ResponseEntity<Transaction> createTransaction(@RequestBody Transaction transaction) {
         transactionService.addTransaction(transaction);
-        return transactionService.getTransactionById(transaction.getId()).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        return transactionService.getTransactionById(transaction.getId()).
+                map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping

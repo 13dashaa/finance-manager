@@ -1,13 +1,10 @@
 package com.example.finance_manager.repository;
 
-import com.example.finance_manager.models.Budget;
 import com.example.finance_manager.models.Transaction;
-import jdk.jfr.Registered;
 import lombok.Getter;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import java.time.LocalDateTime;
 
@@ -32,6 +29,6 @@ public  class TransactionRepository {
                 .filter(transaction -> (userId == null || transaction.getUserId() == userId))
                 .filter(transaction -> (categoryId == null || transaction.getCategoryId() == categoryId))
                 .filter(transaction -> (date == null || transaction.getDate().isEqual(date)))
-                .collect(Collectors.toList());
+                .toList();
     }
 }
