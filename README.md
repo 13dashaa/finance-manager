@@ -39,7 +39,8 @@ Finance Manager — это приложение на Java, предназнач�
 ### Клонирование репозитория
 ```bash
 git clone https://github.com/yourusername/finance-manager.git
-cd finance-manager
+cd finance-manager 
+```
 
 ### Настройка среды выполнения
 
@@ -53,6 +54,7 @@ cd finance-manager
 mvn spring-boot:run
 или
 ./gradlew bootRun
+```
 
 ## Использование
 Используйте REST API для взаимодействия с приложением.
