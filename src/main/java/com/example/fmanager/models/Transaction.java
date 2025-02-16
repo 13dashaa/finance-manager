@@ -1,9 +1,8 @@
-package com.example.finance_manager.models;
+package com.example.fmanager.models;
 
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
-
 
 @Getter
 @Setter
@@ -16,8 +15,9 @@ public class Transaction {
     private LocalDateTime date;
     private LocalDateTime createAt;
 
-    public Transaction(int id, String description, Float amount,
-                       int userId, int categoryId, LocalDateTime date) {
+    public Transaction(int id, String description,
+                       Float amount, int userId,
+                       int categoryId, LocalDateTime date) {
         this.id = id;
         this.description = description;
         this.amount = amount;
@@ -26,6 +26,4 @@ public class Transaction {
         this.date = date;
         this.createAt = LocalDateTime.now();
     }
-
-
 }

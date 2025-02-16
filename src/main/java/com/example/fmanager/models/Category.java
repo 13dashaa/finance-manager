@@ -1,7 +1,8 @@
-package com.example.finance_manager.models;
+package com.example.fmanager.models;
+
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.AllArgsConstructor;
 
 @Getter
 @Setter

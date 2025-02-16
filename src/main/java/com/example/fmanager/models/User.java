@@ -1,4 +1,4 @@
-package com.example.finance_manager.models;
+package com.example.fmanager.models;
 
 import java.time.LocalDateTime;
 import lombok.Getter;
@@ -6,7 +6,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-
 public class User {
     private int id;
     private String username;
@@ -21,5 +20,4 @@ public class User {
         this.password = password;
         this.createdAt = LocalDateTime.now();
     }
-
 }

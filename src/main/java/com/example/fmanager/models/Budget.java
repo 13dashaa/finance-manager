@@ -1,8 +1,8 @@
-package com.example.finance_manager.models;
-import lombok.Getter;
-import lombok.Setter;
+package com.example.fmanager.models;
 
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
 
 
 @Getter
@@ -23,6 +23,4 @@ public class Budget {
         this.period = period;
         this.createdAt = LocalDateTime.now();
     }
-
-
 }

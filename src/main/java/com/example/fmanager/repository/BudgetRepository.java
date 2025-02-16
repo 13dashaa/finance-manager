@@ -1,13 +1,12 @@
-package com.example.finance_manager.repository;
+package com.example.fmanager.repository;
 
-import com.example.finance_manager.models.Budget;
-import lombok.Getter;
-import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
+import com.example.fmanager.models.Budget;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import lombok.Getter;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @Getter
@@ -16,7 +15,8 @@ public class BudgetRepository {
 
     public void addBudget(Budget budget) {
         if (budgets.containsKey(budget.getId())) {
-            throw new IllegalArgumentException("Budget with id " + budget.getId() + " already exists.");
+            throw new
+                    IllegalArgumentException("Budget with id " + budget.getId() + " exists.");
         }
         budgets.put(budget.getId(), budget);
     }

@@ -1,11 +1,16 @@
-package com.example.finance_manager.controller;
+package com.example.fmanager.controller;
 
-import com.example.finance_manager.models.Category;
-import com.example.finance_manager.service.CategoryService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
+import com.example.fmanager.models.Category;
+import com.example.fmanager.service.CategoryService;
 import java.util.List;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/category")
@@ -13,7 +18,6 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    // Инъекция через конструктор
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
@@ -21,7 +25,8 @@ public class CategoryController {
     @PostMapping
     public ResponseEntity<Category> createCategory(@RequestBody Category category) {
         categoryService.addCategory(category);
-        return categoryService.getCategoryById(category.getId())
+        return categoryService
+                .getCategoryById(category.getId())
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -33,7 +38,8 @@ public class CategoryController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Category> getCategoryById(@PathVariable int id) {
-        return categoryService.getCategoryById(id)
+        return categoryService
+                .getCategoryById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

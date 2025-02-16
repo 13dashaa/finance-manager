@@ -1,11 +1,10 @@
-package com.example.finance_manager.service;
+package com.example.fmanager.service;
 
-import com.example.finance_manager.models.Category;
-import com.example.finance_manager.repository.CategoryRepository;
-import org.springframework.stereotype.Service;
-
+import com.example.fmanager.models.Category;
+import com.example.fmanager.repository.CategoryRepository;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.stereotype.Service;
 
 @Service
 public class CategoryService {
@@ -19,11 +18,12 @@ public class CategoryService {
     public void addCategory(Category category) {
         categoryRepository.addCategory(category);
     }
+
     public List<Category> getAllCategories() {
         return categoryRepository.getCategories();
     }
+
     public Optional<Category> getCategoryById(int id) {
         return categoryRepository.findCategoryById(id);
     }
-
 }
