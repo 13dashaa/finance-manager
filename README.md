@@ -52,7 +52,9 @@ cd finance-manager
 Для запуска приложения используйте следующую команду:
 ```bash
 mvn spring-boot:run
+```
 или
+```bash
 ./gradlew bootRun
 ```
 
