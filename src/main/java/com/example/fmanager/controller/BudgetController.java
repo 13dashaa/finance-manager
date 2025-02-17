@@ -1,13 +1,16 @@
 package com.example.fmanager.controller;
 
+import com.example.fmanager.dto.BudgetDto;
 import com.example.fmanager.models.Budget;
 import com.example.fmanager.service.BudgetService;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,8 +27,8 @@ public class BudgetController {
     }
 
     @PostMapping
-    public ResponseEntity<Budget> createBudget(@RequestBody Budget budget) {
-        budgetService.addBudget(budget);
+    public ResponseEntity<BudgetDto> createBudget(@RequestBody Budget budget) {
+        budgetService.createBudget(budget);
         return budgetService
                 .getBudgetById(budget.getId())
                 .map(ResponseEntity::ok)
@@ -33,19 +36,31 @@ public class BudgetController {
     }
 
     @GetMapping
-    public List<Budget> filterBudgets(
+    public List<BudgetDto> filterBudgets(
             @RequestParam(required = false) Integer userId,
             @RequestParam(required = false) Integer categoryId,
             @RequestParam(required = false) Float limit) {
-        return budgetService.filterBudgets(userId, categoryId, limit);
+        return budgetService.getAllBudgets();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Budget> getBudget(@PathVariable int id) {
+    public ResponseEntity<BudgetDto> getBudget(@PathVariable int id) {
         return budgetService
                 .getBudgetById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteBudget(@PathVariable int id) {
+        budgetService.deleteBudget(id);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<BudgetDto> updateBudget(@PathVariable int id,
+                                                  @RequestBody Budget budgetDetails) {
+        BudgetDto updatedBudget = budgetService.updateBudget(id, budgetDetails);
+        return ResponseEntity.ok(updatedBudget);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

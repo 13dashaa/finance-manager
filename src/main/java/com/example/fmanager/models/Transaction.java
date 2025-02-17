@@ -1,29 +1,41 @@
 package com.example.fmanager.models;
 
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Getter
 @Setter
+@Entity
 public class Transaction {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
+    @Column
     private String description;
+    @Column(nullable = false)
     private Float amount;
-    private int userId;
-    private int categoryId;
-    private LocalDateTime date;
-    private LocalDateTime createAt;
 
-    public Transaction(int id, String description,
-                       Float amount, int userId,
-                       int categoryId, LocalDateTime date) {
-        this.id = id;
-        this.description = description;
-        this.amount = amount;
-        this.userId = userId;
-        this.categoryId = categoryId;
-        this.date = date;
-        this.createAt = LocalDateTime.now();
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
+    @Column
+    private LocalDateTime date;
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
 }

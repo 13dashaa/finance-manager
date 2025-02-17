@@ -1,14 +1,17 @@
 package com.example.fmanager.service;
 
+import com.example.fmanager.dto.TransactionDto;
 import com.example.fmanager.models.Transaction;
 import com.example.fmanager.repository.TransactionRepository;
-import java.time.LocalDateTime;
+import jakarta.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TransactionService {
+    public static final String TRANSACTION_NOT_FOUND_MESSAGE = "Transaction not found";
 
     private TransactionRepository transactionRepository;
 
@@ -16,20 +19,41 @@ public class TransactionService {
         this.transactionRepository = transactionRepository;
     }
 
-    public void addTransaction(Transaction transaction) {
-        transactionRepository.addTransaction(transaction);
+    public List<TransactionDto> getAllTransactions() {
+        List<Transaction> transactions = transactionRepository.findAll();
+        List<TransactionDto> transactionDtos = new ArrayList<>();
+        for (Transaction transaction : transactions) {
+            transactionDtos.add(TransactionDto.convertToDto(transaction));
+        }
+        return transactionDtos;
     }
 
-    public List<Transaction> getAllTransaction() {
-        return transactionRepository.getTransaction();
+    public Optional<TransactionDto> getTransactionById(int id) {
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException(TRANSACTION_NOT_FOUND_MESSAGE));
+        return Optional.of(TransactionDto.convertToDto(transaction));
     }
 
-    public Optional<Transaction> getTransactionById(int id) {
-        return transactionRepository.findTransactionById(id);
+    public Transaction createTransaction(Transaction transaction) {
+        return transactionRepository.save(transaction);
     }
 
-    public List<Transaction> filterTransactions(
-            Integer userId, Integer categoryId, LocalDateTime date) {
-        return transactionRepository.filterTransactions(userId, categoryId, date);
+    @Transactional
+    public TransactionDto updateTransaction(int id, Transaction transactionDetails) {
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException(TRANSACTION_NOT_FOUND_MESSAGE));
+        transaction.setDescription(transactionDetails.getDescription());
+        transaction.setAmount(transactionDetails.getAmount());
+        transaction.setDate(transactionDetails.getDate());
+        transaction.setAccount(transactionDetails.getAccount());
+        transaction.setCategory(transactionDetails.getCategory());
+        return TransactionDto.convertToDto(transactionRepository.save(transaction));
+    }
+
+    @Transactional
+    public void deleteTransaction(int id) {
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException(TRANSACTION_NOT_FOUND_MESSAGE));
+        transactionRepository.delete(transaction);
     }
 }
