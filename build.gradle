@@ -7,9 +7,13 @@ plugins {
 
 sonar {
     properties {
-        property "sonar.projectKey", "13dashaa_finance-manager"
-        property "sonar.organization", "13dashaa"
+        property "sonar.projectKey", "13dashaa"
+        property "sonar.organization", "dasha makushunskaya"
         property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.projectName", "Finance Manager"
+        property "sonar.projectVersion", version
+        property "sonar.sources", "src/main/java"
+        property "sonar.tests", "src/test/java"
     }
 }
 

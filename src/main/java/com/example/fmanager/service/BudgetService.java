@@ -23,6 +23,8 @@ public class BudgetService {
         return budgetRepository.getBudgets();
     }
 
+
+
     public Optional<Budget> getBudgetById(int id) {
         return budgetRepository.findBudgetById(id);
     }
