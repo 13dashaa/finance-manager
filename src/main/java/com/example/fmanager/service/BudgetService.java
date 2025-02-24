@@ -2,6 +2,7 @@ package com.example.fmanager.service;
 
 
 import com.example.fmanager.dto.BudgetDto;
+import com.example.fmanager.exception.ExceptionNotFound;
 import com.example.fmanager.models.Budget;
 import com.example.fmanager.repository.BudgetRepository;
 import jakarta.transaction.Transactional;
@@ -30,7 +31,7 @@ public class BudgetService {
 
     public Optional<BudgetDto> getBudgetById(int id) {
         Budget budget = budgetRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(BUDGET_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new ExceptionNotFound(BUDGET_NOT_FOUND_MESSAGE));
         return Optional.of(BudgetDto.convertToDto(budget));
     }
 
@@ -41,7 +42,7 @@ public class BudgetService {
     @Transactional
     public BudgetDto updateBudget(int id, Budget budgetDetails) {
         Budget budget = budgetRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(BUDGET_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new ExceptionNotFound(BUDGET_NOT_FOUND_MESSAGE));
         budget.setPeriod(budgetDetails.getPeriod());
         budget.setLimitation(budgetDetails.getLimitation());
         budget.setClients(budgetDetails.getClients()); // Обновление клиентов
@@ -52,7 +53,7 @@ public class BudgetService {
     @Transactional
     public void deleteBudget(int id) {
         Budget budget = budgetRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(BUDGET_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new ExceptionNotFound(BUDGET_NOT_FOUND_MESSAGE));
         budgetRepository.delete(budget);
     }
 }

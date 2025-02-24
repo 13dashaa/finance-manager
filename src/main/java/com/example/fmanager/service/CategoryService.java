@@ -1,6 +1,7 @@
 package com.example.fmanager.service;
 
 import com.example.fmanager.dto.CategoryDto;
+import com.example.fmanager.exception.ExceptionNotFound;
 import com.example.fmanager.models.Category;
 import com.example.fmanager.repository.CategoryRepository;
 import jakarta.transaction.Transactional;
@@ -30,7 +31,7 @@ public class CategoryService {
 
     public Optional<CategoryDto> findById(int id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category is not found"));
+                .orElseThrow(() -> new ExceptionNotFound("Category is not found"));
         return Optional.of(CategoryDto.convertToDto(category));
     }
 
@@ -41,7 +42,7 @@ public class CategoryService {
     @Transactional
     public CategoryDto updateCategory(int id, Category categoryDetails) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new ExceptionNotFound("Category not found"));
         category.setName(categoryDetails.getName());
         category.setBudgets(categoryDetails.getBudgets());
         category.setTransactions(categoryDetails.getTransactions());
@@ -51,7 +52,7 @@ public class CategoryService {
     @Transactional
     public void deleteCategory(int id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new ExceptionNotFound("Category not found"));
         categoryRepository.delete(category);
     }
 }

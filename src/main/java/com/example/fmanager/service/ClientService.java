@@ -1,6 +1,7 @@
 package com.example.fmanager.service;
 
 import com.example.fmanager.dto.ClientDto;
+import com.example.fmanager.exception.ExceptionNotFound;
 import com.example.fmanager.models.Client;
 import com.example.fmanager.repository.ClientRepository;
 import jakarta.transaction.Transactional;
@@ -29,7 +30,7 @@ public class ClientService {
 
     public Optional<ClientDto> findById(int id) {
         Client client = clientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Client not found"));
+                .orElseThrow(() -> new ExceptionNotFound("Client not found"));
         return Optional.of(ClientDto.convertToDto(client));
     }
 
@@ -40,7 +41,7 @@ public class ClientService {
     @Transactional
     public ClientDto updateUser(int id, Client userDetails) {
         Client user = clientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ExceptionNotFound("User not found"));
         user.setUsername(userDetails.getUsername());
         user.setPassword(userDetails.getPassword());
         user.setEmail(userDetails.getEmail());
@@ -52,7 +53,7 @@ public class ClientService {
     @Transactional
     public void deleteUser(int id) {
         Client user = clientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ExceptionNotFound("User not found"));
         clientRepository.delete(user);
     }
 }

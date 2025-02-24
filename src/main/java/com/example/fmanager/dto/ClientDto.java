@@ -3,6 +3,7 @@ package com.example.fmanager.dto;
 import com.example.fmanager.models.Account;
 import com.example.fmanager.models.Budget;
 import com.example.fmanager.models.Client;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.Getter;
@@ -22,14 +23,24 @@ public class ClientDto {
     public static ClientDto convertToDto(Client client) {
         ClientDto dto = new ClientDto();
         dto.setId(client.getId());
-        dto.setAccountIds(client.getAccounts().stream()
-                .map(Account::getId)
-                .collect(Collectors.toSet()));
+        Set<Account> accounts = client.getAccounts();
+        if (accounts != null) {
+            dto.setAccountIds(client.getAccounts().stream()
+                    .map(Account::getId)
+                    .collect(Collectors.toSet()));
+        } else {
+            dto.setAccountIds(new HashSet<>());
+        }
         dto.setUsername(client.getUsername());
         dto.setEmail(client.getEmail());
-        dto.setBudgetIds(client.getBudgets().stream()
-                .map(Budget::getId)
-                .collect(Collectors.toSet()));
+        Set<Budget> budgets = client.getBudgets();
+        if (budgets != null) {
+            dto.setBudgetIds(client.getBudgets().stream()
+                    .map(Budget::getId)
+                    .collect(Collectors.toSet()));
+        } else {
+            dto.setBudgetIds(new HashSet<>());
+        }
         return dto;
     }
 }

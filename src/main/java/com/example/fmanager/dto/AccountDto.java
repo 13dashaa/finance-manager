@@ -1,8 +1,10 @@
 package com.example.fmanager.dto;
 
 import com.example.fmanager.models.Account;
+import com.example.fmanager.models.Budget;
 import com.example.fmanager.models.Transaction;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.Getter;
@@ -24,9 +26,14 @@ public class AccountDto {
     public static AccountDto convertToDto(Account account) {
         AccountDto dto = new AccountDto();
         dto.setId(account.getId());
-        dto.setTransactionIds(account.getTransactions().stream()
+        Set<Transaction> transactions = account.getTransactions();
+        if (transactions != null) {
+            dto.setTransactionIds(account.getTransactions().stream()
                 .map(Transaction::getId)
                 .collect(Collectors.toSet()));
+        } else {
+            dto.setTransactionIds(new HashSet<>());
+        }
         dto.setClientId(account.getClient().getId());
         dto.setName(account.getName());
         dto.setBalance(account.getBalance());

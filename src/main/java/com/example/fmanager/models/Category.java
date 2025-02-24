@@ -21,9 +21,7 @@ public class Category {
     @Column
     private String name;
     @OneToMany(mappedBy = "category", fetch = FetchType.EAGER)
-    //@JsonManagedReference
     private Set<Budget> budgets;
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
-    //@JsonManagedReference
     private Set<Transaction> transactions;
 }

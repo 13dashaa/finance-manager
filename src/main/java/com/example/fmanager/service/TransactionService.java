@@ -1,6 +1,7 @@
 package com.example.fmanager.service;
 
 import com.example.fmanager.dto.TransactionDto;
+import com.example.fmanager.exception.ExceptionNotFound;
 import com.example.fmanager.models.Transaction;
 import com.example.fmanager.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
@@ -30,7 +31,7 @@ public class TransactionService {
 
     public Optional<TransactionDto> getTransactionById(int id) {
         Transaction transaction = transactionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(TRANSACTION_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new ExceptionNotFound(TRANSACTION_NOT_FOUND_MESSAGE));
         return Optional.of(TransactionDto.convertToDto(transaction));
     }
 
@@ -41,7 +42,7 @@ public class TransactionService {
     @Transactional
     public TransactionDto updateTransaction(int id, Transaction transactionDetails) {
         Transaction transaction = transactionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(TRANSACTION_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new ExceptionNotFound(TRANSACTION_NOT_FOUND_MESSAGE));
         transaction.setDescription(transactionDetails.getDescription());
         transaction.setAmount(transactionDetails.getAmount());
         transaction.setDate(transactionDetails.getDate());
@@ -53,7 +54,7 @@ public class TransactionService {
     @Transactional
     public void deleteTransaction(int id) {
         Transaction transaction = transactionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(TRANSACTION_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new ExceptionNotFound(TRANSACTION_NOT_FOUND_MESSAGE));
         transactionRepository.delete(transaction);
     }
 }

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/budget")
+@RequestMapping("/budgets")
 public class BudgetController {
     private final BudgetService budgetService;
 

@@ -1,8 +1,8 @@
 package com.example.fmanager.controller;
 
-import com.example.fmanager.dto.ClientDto;
-import com.example.fmanager.models.Client;
-import com.example.fmanager.service.ClientService;
+import com.example.fmanager.dto.GoalDto;
+import com.example.fmanager.models.Goals;
+import com.example.fmanager.service.GoalService;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,48 +16,48 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/clients")
-public class ClientController {
+@RequestMapping("/goals")
+public class GoalController {
+    private final GoalService goalService;
 
-    private ClientService clientService;
-
-    public ClientController(ClientService clientService) {
-        this.clientService = clientService;
+    public GoalController(GoalService goalService) {
+        this.goalService = goalService;
     }
 
     @PostMapping
-    public ResponseEntity<ClientDto> createUser(@RequestBody Client client) {
-        clientService.createUser(client);
-        return clientService
-                .findById(client.getId())
+    public ResponseEntity<GoalDto> createCategory(@RequestBody Goals golas) {
+        goalService.createGoal(golas);
+        return goalService
+                .getGoalById(golas.getId())
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping
-    public List<ClientDto> getClients() {
-        return clientService.findAll();
+    public List<GoalDto> getGoalss() {
+        return goalService.getAllGoals();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ClientDto> getClientById(@PathVariable int id) {
-        return clientService
-                .findById(id)
+    public ResponseEntity<GoalDto> getGoalById(@PathVariable int id) {
+        return goalService
+                .getGoalById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public void deleteClient(@PathVariable int id) {
-        clientService.deleteUser(id);
+    public void deleteGoal(@PathVariable int id) {
+        goalService.deleteGoal(id);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ClientDto> updateClient(@PathVariable int id,
-                                                  @RequestBody Client clientDetails) {
-        ClientDto updatedClient = clientService.updateUser(id, clientDetails);
-        return ResponseEntity.ok(updatedClient);
+    public ResponseEntity<GoalDto> updateGoal(@PathVariable int id,
+                                                      @RequestBody Goals goalDetails) {
+        GoalDto updatedGoal = goalService.updateGoal(id, goalDetails);
+        return ResponseEntity.ok(updatedGoal);
     }
+
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {

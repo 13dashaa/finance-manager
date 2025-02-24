@@ -41,8 +41,10 @@ public class Client {
                cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Account> accounts;
 
+    @OneToMany(mappedBy = "client", fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Goals> goals;
     @ManyToMany(mappedBy = "clients")
-
     private Set<Budget> budgets;
 
     @PreRemove

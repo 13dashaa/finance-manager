@@ -21,10 +21,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Getter
 @Setter
 @Entity
-/*@JsonIdentityInfo(
-        generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id"
-)*/
+
 @Table(name = "budget")
 public class Budget {
 
