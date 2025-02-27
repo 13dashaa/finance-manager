@@ -2,7 +2,7 @@ package com.example.fmanager.service;
 
 import com.example.fmanager.dto.TransactionDto;
 import com.example.fmanager.exception.ExceptionNotFound;
-import com.example.fmanager.models.Transaction;
+import com.example.fmanager.models.Transactions;
 import com.example.fmanager.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
@@ -21,27 +21,27 @@ public class TransactionService {
     }
 
     public List<TransactionDto> getAllTransactions() {
-        List<Transaction> transactions = transactionRepository.findAll();
+        List<Transactions> transactions = transactionRepository.findAll();
         List<TransactionDto> transactionDtos = new ArrayList<>();
-        for (Transaction transaction : transactions) {
+        for (Transactions transaction : transactions) {
             transactionDtos.add(TransactionDto.convertToDto(transaction));
         }
         return transactionDtos;
     }
 
     public Optional<TransactionDto> getTransactionById(int id) {
-        Transaction transaction = transactionRepository.findById(id)
+        Transactions transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new ExceptionNotFound(TRANSACTION_NOT_FOUND_MESSAGE));
         return Optional.of(TransactionDto.convertToDto(transaction));
     }
 
-    public Transaction createTransaction(Transaction transaction) {
+    public Transactions createTransaction(Transactions transaction) {
         return transactionRepository.save(transaction);
     }
 
     @Transactional
-    public TransactionDto updateTransaction(int id, Transaction transactionDetails) {
-        Transaction transaction = transactionRepository.findById(id)
+    public TransactionDto updateTransaction(int id, Transactions transactionDetails) {
+        Transactions transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new ExceptionNotFound(TRANSACTION_NOT_FOUND_MESSAGE));
         transaction.setDescription(transactionDetails.getDescription());
         transaction.setAmount(transactionDetails.getAmount());
@@ -53,7 +53,7 @@ public class TransactionService {
 
     @Transactional
     public void deleteTransaction(int id) {
-        Transaction transaction = transactionRepository.findById(id)
+        Transactions transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new ExceptionNotFound(TRANSACTION_NOT_FOUND_MESSAGE));
         transactionRepository.delete(transaction);
     }

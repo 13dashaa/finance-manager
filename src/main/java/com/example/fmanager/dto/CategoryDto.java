@@ -1,8 +1,8 @@
 package com.example.fmanager.dto;
 
-import com.example.fmanager.models.Budget;
-import com.example.fmanager.models.Category;
-import com.example.fmanager.models.Transaction;
+import com.example.fmanager.models.Budgets;
+import com.example.fmanager.models.Categories;
+import com.example.fmanager.models.Transactions;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,19 +19,19 @@ public class CategoryDto {
     private Set<Integer> transactionIds;
 
 
-    public static CategoryDto convertToDto(Category category) {
+    public static CategoryDto convertToDto(Categories category) {
         CategoryDto dto = new CategoryDto();
         dto.setId(category.getId());
-        Set<Budget> budgets = category.getBudgets();
+        Set<Budgets> budgets = category.getBudgets();
         if (budgets != null) {
-            dto.setBudgetIds(budgets.stream().map(Budget::getId).collect(Collectors.toSet()));
+            dto.setBudgetIds(budgets.stream().map(Budgets::getId).collect(Collectors.toSet()));
         } else {
             dto.setBudgetIds(new HashSet<>());
         }
-        Set<Transaction> transactions = category.getTransactions();
+        Set<Transactions> transactions = category.getTransactions();
         if (transactions != null) {
             dto.setTransactionIds(category.getTransactions().stream()
-                    .map(Transaction::getId)
+                    .map(Transactions::getId)
                     .collect(Collectors.toSet()));
         } else {
             dto.setTransactionIds(new HashSet<>());

@@ -3,7 +3,7 @@ package com.example.fmanager.service;
 
 import com.example.fmanager.dto.BudgetDto;
 import com.example.fmanager.exception.ExceptionNotFound;
-import com.example.fmanager.models.Budget;
+import com.example.fmanager.models.Budgets;
 import com.example.fmanager.repository.BudgetRepository;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
@@ -21,27 +21,27 @@ public class BudgetService {
     }
 
     public List<BudgetDto> getAllBudgets() {
-        List<Budget> budgets = budgetRepository.findAll();
+        List<Budgets> budgets = budgetRepository.findAll();
         List<BudgetDto> budgetDtos = new ArrayList<>();
-        for (Budget budget : budgets) {
+        for (Budgets budget : budgets) {
             budgetDtos.add(BudgetDto.convertToDto(budget));
         }
         return budgetDtos;
     }
 
     public Optional<BudgetDto> getBudgetById(int id) {
-        Budget budget = budgetRepository.findById(id)
+        Budgets budget = budgetRepository.findById(id)
                 .orElseThrow(() -> new ExceptionNotFound(BUDGET_NOT_FOUND_MESSAGE));
         return Optional.of(BudgetDto.convertToDto(budget));
     }
 
-    public Budget createBudget(Budget budget) {
+    public Budgets createBudget(Budgets budget) {
         return budgetRepository.save(budget);
     }
 
     @Transactional
-    public BudgetDto updateBudget(int id, Budget budgetDetails) {
-        Budget budget = budgetRepository.findById(id)
+    public BudgetDto updateBudget(int id, Budgets budgetDetails) {
+        Budgets budget = budgetRepository.findById(id)
                 .orElseThrow(() -> new ExceptionNotFound(BUDGET_NOT_FOUND_MESSAGE));
         budget.setPeriod(budgetDetails.getPeriod());
         budget.setLimitation(budgetDetails.getLimitation());
@@ -52,7 +52,7 @@ public class BudgetService {
 
     @Transactional
     public void deleteBudget(int id) {
-        Budget budget = budgetRepository.findById(id)
+        Budgets budget = budgetRepository.findById(id)
                 .orElseThrow(() -> new ExceptionNotFound(BUDGET_NOT_FOUND_MESSAGE));
         budgetRepository.delete(budget);
     }

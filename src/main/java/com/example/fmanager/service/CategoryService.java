@@ -2,7 +2,7 @@ package com.example.fmanager.service;
 
 import com.example.fmanager.dto.CategoryDto;
 import com.example.fmanager.exception.ExceptionNotFound;
-import com.example.fmanager.models.Category;
+import com.example.fmanager.models.Categories;
 import com.example.fmanager.repository.CategoryRepository;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
@@ -21,27 +21,27 @@ public class CategoryService {
     }
 
     public List<CategoryDto> findAll() {
-        List<Category> categories = categoryRepository.findAll();
+        List<Categories> categories = categoryRepository.findAll();
         List<CategoryDto> categoryDtos = new ArrayList<>();
-        for (Category category : categories) {
+        for (Categories category : categories) {
             categoryDtos.add(CategoryDto.convertToDto(category));
         }
         return categoryDtos;
     }
 
     public Optional<CategoryDto> findById(int id) {
-        Category category = categoryRepository.findById(id)
+        Categories category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ExceptionNotFound("Category is not found"));
         return Optional.of(CategoryDto.convertToDto(category));
     }
 
-    public Category createCategory(Category category) {
+    public Categories createCategory(Categories category) {
         return categoryRepository.save(category);
     }
 
     @Transactional
-    public CategoryDto updateCategory(int id, Category categoryDetails) {
-        Category category = categoryRepository.findById(id)
+    public CategoryDto updateCategory(int id, Categories categoryDetails) {
+        Categories category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ExceptionNotFound("Category not found"));
         category.setName(categoryDetails.getName());
         category.setBudgets(categoryDetails.getBudgets());
@@ -51,7 +51,7 @@ public class CategoryService {
 
     @Transactional
     public void deleteCategory(int id) {
-        Category category = categoryRepository.findById(id)
+        Categories category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ExceptionNotFound("Category not found"));
         categoryRepository.delete(category);
     }

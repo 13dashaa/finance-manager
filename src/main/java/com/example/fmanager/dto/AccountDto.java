@@ -1,8 +1,7 @@
 package com.example.fmanager.dto;
 
-import com.example.fmanager.models.Account;
-import com.example.fmanager.models.Budget;
-import com.example.fmanager.models.Transaction;
+import com.example.fmanager.models.Accounts;
+import com.example.fmanager.models.Transactions;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,13 +22,13 @@ public class AccountDto {
     private Set<Integer> transactionIds;
 
 
-    public static AccountDto convertToDto(Account account) {
+    public static AccountDto convertToDto(Accounts account) {
         AccountDto dto = new AccountDto();
         dto.setId(account.getId());
-        Set<Transaction> transactions = account.getTransactions();
+        Set<Transactions> transactions = account.getTransactions();
         if (transactions != null) {
             dto.setTransactionIds(account.getTransactions().stream()
-                .map(Transaction::getId)
+                .map(Transactions::getId)
                 .collect(Collectors.toSet()));
         } else {
             dto.setTransactionIds(new HashSet<>());

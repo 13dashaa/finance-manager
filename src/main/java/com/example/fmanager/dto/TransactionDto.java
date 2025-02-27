@@ -1,6 +1,6 @@
 package com.example.fmanager.dto;
 
-import com.example.fmanager.models.Transaction;
+import com.example.fmanager.models.Transactions;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +17,7 @@ public class TransactionDto {
     private LocalDateTime createdAt; // Временная метка создания
 
 
-    public static TransactionDto convertToDto(Transaction transaction) {
+    public static TransactionDto convertToDto(Transactions transaction) {
         TransactionDto dto = new TransactionDto();
         dto.setId(transaction.getId());
         dto.setCategoryId(transaction.getCategory().getId());

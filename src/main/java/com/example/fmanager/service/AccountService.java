@@ -2,7 +2,7 @@ package com.example.fmanager.service;
 
 import com.example.fmanager.dto.AccountDto;
 import com.example.fmanager.exception.ExceptionNotFound;
-import com.example.fmanager.models.Account;
+import com.example.fmanager.models.Accounts;
 import com.example.fmanager.repository.AccountRepository;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
@@ -20,28 +20,28 @@ public class AccountService {
     }
 
     public Optional<AccountDto> getAccountById(int id) {
-        Account account = accountRepository.findById(id)
+        Accounts account = accountRepository.findById(id)
                 .orElseThrow(() -> new ExceptionNotFound(ACCOUNT_NOT_FOUND_MESSAGE));
         return Optional.of(AccountDto.convertToDto(account));
     }
 
 
     public List<AccountDto> getAllAccounts() {
-        List<Account> accounts = accountRepository.findAll();
+        List<Accounts> accounts = accountRepository.findAll();
         List<AccountDto> accountDtos = new ArrayList<>();
-        for (Account account : accounts) {
+        for (Accounts account : accounts) {
             accountDtos.add(AccountDto.convertToDto(account));
         }
         return accountDtos;
     }
 
-    public Account createAccount(Account account) {
+    public Accounts createAccount(Accounts account) {
         return accountRepository.save(account);
     }
 
     @Transactional
-    public AccountDto updateAccount(int id, Account accountDetails) {
-        Account account = accountRepository.findById(id)
+    public AccountDto updateAccount(int id, Accounts accountDetails) {
+        Accounts account = accountRepository.findById(id)
                 .orElseThrow(() -> new ExceptionNotFound(ACCOUNT_NOT_FOUND_MESSAGE));
         account.setName(accountDetails.getName());
         account.setBalance(accountDetails.getBalance());
@@ -52,7 +52,7 @@ public class AccountService {
 
     @Transactional
     public void deleteAccount(int id) {
-        Account account = accountRepository.findById(id)
+        Accounts account = accountRepository.findById(id)
                 .orElseThrow(() -> new ExceptionNotFound(ACCOUNT_NOT_FOUND_MESSAGE));
         accountRepository.delete(account);
     }

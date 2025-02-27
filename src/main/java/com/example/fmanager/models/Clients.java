@@ -20,7 +20,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Getter
 @Setter
 @Entity
-public class Client {
+public class Clients {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,17 +39,17 @@ public class Client {
 
     @OneToMany(mappedBy = "client", fetch = FetchType.LAZY,
                cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Account> accounts;
+    private Set<Accounts> accounts;
 
     @OneToMany(mappedBy = "client", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Goals> goals;
     @ManyToMany(mappedBy = "clients")
-    private Set<Budget> budgets;
+    private Set<Budgets> budgets;
 
     @PreRemove
     private void removeUserFromBudgets() {
-        for (Budget budget : budgets) {
+        for (Budgets budget : budgets) {
             budget.getClients().remove(this);
         }
     }

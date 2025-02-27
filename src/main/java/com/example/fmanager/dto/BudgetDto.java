@@ -1,7 +1,7 @@
 package com.example.fmanager.dto;
 
-import com.example.fmanager.models.Budget;
-import com.example.fmanager.models.Client;
+import com.example.fmanager.models.Budgets;
+import com.example.fmanager.models.Clients;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,13 +22,13 @@ public class BudgetDto {
     private LocalDateTime updatedAt;
 
 
-    public static BudgetDto convertToDto(Budget budget) {
+    public static BudgetDto convertToDto(Budgets budget) {
         BudgetDto dto = new BudgetDto();
         dto.setId(budget.getId());
-        Set<Client> clients = budget.getClients();
+        Set<Clients> clients = budget.getClients();
         if (clients != null) {
             dto.setClientIds(budget.getClients().stream()
-                    .map(Client::getId)
+                    .map(Clients::getId)
                     .collect(Collectors.toSet()));
         } else {
             dto.setClientIds(new HashSet<>());

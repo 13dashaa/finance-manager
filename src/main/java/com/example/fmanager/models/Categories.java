@@ -14,14 +14,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-public class Category {
+public class Categories {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column
     private String name;
     @OneToMany(mappedBy = "category", fetch = FetchType.EAGER)
-    private Set<Budget> budgets;
+    private Set<Budgets> budgets;
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
-    private Set<Transaction> transactions;
+    private Set<Transactions> transactions;
 }
