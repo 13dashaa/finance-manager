@@ -41,8 +41,8 @@ public class Budgets {
     private Categories category;
 
 
-    @Column(nullable = false)
-    private Float limitation;
+   //@Column(nullable = false)
+    //private Float limitation;
     @Column
     private int period;
     @CreationTimestamp
