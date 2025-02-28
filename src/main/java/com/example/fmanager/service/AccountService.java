@@ -25,9 +25,17 @@ public class AccountService {
         return Optional.of(AccountDto.convertToDto(account));
     }
 
-
     public List<AccountDto> getAllAccounts() {
         List<Accounts> accounts = accountRepository.findAll();
+        List<AccountDto> accountDtos = new ArrayList<>();
+        for (Accounts account : accounts) {
+            accountDtos.add(AccountDto.convertToDto(account));
+        }
+        return accountDtos;
+    }
+
+    public List<AccountDto> findByClientId(int clientId) {
+        List<Accounts> accounts = accountRepository.findAllByClientId(clientId);
         List<AccountDto> accountDtos = new ArrayList<>();
         for (Accounts account : accounts) {
             accountDtos.add(AccountDto.convertToDto(account));

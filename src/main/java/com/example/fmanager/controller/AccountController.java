@@ -1,9 +1,9 @@
 package com.example.fmanager.controller;
 
+import java.util.List;
 import com.example.fmanager.dto.AccountDto;
 import com.example.fmanager.models.Accounts;
 import com.example.fmanager.service.AccountService;
-import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -50,6 +50,11 @@ public class AccountController {
                 .getAccountById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/filter")
+    public List<AccountDto> getAccountsByClient(@RequestParam int clientId) {
+        return  accountService.findByClientId(clientId);
     }
 
     @PutMapping("/{id}")

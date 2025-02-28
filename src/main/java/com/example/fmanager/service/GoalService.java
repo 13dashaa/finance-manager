@@ -1,13 +1,13 @@
 package com.example.fmanager.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import com.example.fmanager.dto.GoalDto;
 import com.example.fmanager.exception.ExceptionNotFound;
 import com.example.fmanager.models.Goals;
 import com.example.fmanager.repository.GoalRepository;
 import jakarta.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,9 +25,17 @@ public class GoalService {
         return Optional.of(GoalDto.convertToDto(goal));
     }
 
-
     public List<GoalDto> getAllGoals() {
         List<Goals> goals = goalRepository.findAll();
+        List<GoalDto> goalsDtos = new ArrayList<>();
+        for (Goals goal : goals) {
+            goalsDtos.add(GoalDto.convertToDto(goal));
+        }
+        return goalsDtos;
+    }
+
+    public List<GoalDto> findByClientId(int clientId) {
+        List<Goals> goals = goalRepository.findByClientId(clientId);
         List<GoalDto> goalsDtos = new ArrayList<>();
         for (Goals goal : goals) {
             goalsDtos.add(GoalDto.convertToDto(goal));

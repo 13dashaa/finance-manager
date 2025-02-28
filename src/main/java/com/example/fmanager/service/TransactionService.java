@@ -29,6 +29,15 @@ public class TransactionService {
         return transactionDtos;
     }
 
+    public List<TransactionDto> findByClientIdAndCategoryId(int clientId, int categoryId) {
+        List<Transactions> transactions = transactionRepository.findAllByClientIdAndCategoryId(clientId, categoryId);
+        List<TransactionDto> transactionDtos = new ArrayList<>();
+        for (Transactions transaction : transactions) {
+            transactionDtos.add(TransactionDto.convertToDto(transaction));
+        }
+        return transactionDtos;
+    }
+
     public Optional<TransactionDto> getTransactionById(int id) {
         Transactions transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new ExceptionNotFound(TRANSACTION_NOT_FOUND_MESSAGE));

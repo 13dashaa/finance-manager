@@ -16,12 +16,9 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-
 @Getter
 @Setter
 @Entity
-
-
 public class Budgets {
 
     @Id
@@ -35,20 +32,15 @@ public class Budgets {
             inverseJoinColumns = @JoinColumn(name = "client_id")
     )
     private Set<Clients> clients;
-
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Categories category;
-
-
-   //@Column(nullable = false)
-    //private Float limitation;
+    @Column(nullable = false)
+    private Float limitation;
     @Column
     private int period;
     @CreationTimestamp
     private LocalDateTime createdAt;
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-
 }

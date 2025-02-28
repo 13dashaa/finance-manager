@@ -1,9 +1,9 @@
 package com.example.fmanager.controller;
 
+import java.util.List;
 import com.example.fmanager.dto.GoalDto;
 import com.example.fmanager.models.Goals;
 import com.example.fmanager.service.GoalService;
-import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -46,6 +47,11 @@ public class GoalController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/filter")
+    public List<GoalDto> getGoalsByClient(@RequestParam int clientId) {
+        return  goalService.findByClientId(clientId);
+    }
+
     @DeleteMapping("/{id}")
     public void deleteGoal(@PathVariable int id) {
         goalService.deleteGoal(id);
@@ -53,7 +59,7 @@ public class GoalController {
 
     @PutMapping("/{id}")
     public ResponseEntity<GoalDto> updateGoal(@PathVariable int id,
-                                                      @RequestBody Goals goalDetails) {
+                                              @RequestBody Goals goalDetails) {
         GoalDto updatedGoal = goalService.updateGoal(id, goalDetails);
         return ResponseEntity.ok(updatedGoal);
     }

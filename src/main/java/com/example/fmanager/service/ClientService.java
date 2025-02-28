@@ -1,13 +1,13 @@
 package com.example.fmanager.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import com.example.fmanager.dto.ClientDto;
 import com.example.fmanager.exception.ExceptionNotFound;
 import com.example.fmanager.models.Clients;
 import com.example.fmanager.repository.ClientRepository;
 import jakarta.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service

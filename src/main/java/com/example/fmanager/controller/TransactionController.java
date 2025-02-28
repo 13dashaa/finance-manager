@@ -1,10 +1,10 @@
 package com.example.fmanager.controller;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import com.example.fmanager.dto.TransactionDto;
 import com.example.fmanager.models.Transactions;
 import com.example.fmanager.service.TransactionService;
-import java.time.LocalDateTime;
-import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -50,6 +50,14 @@ public class TransactionController {
                 .getTransactionById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/filter")
+    public List<TransactionDto> getTransactionsByClientAndCategory(
+            @RequestParam int clientId,
+            @RequestParam int categoryId
+    ) {
+        return transactionService.findByClientIdAndCategoryId(clientId, categoryId);
     }
 
     @PutMapping("/{id}")
