@@ -40,7 +40,7 @@ public class Accounts {
     private Set<Transactions> transactions = new HashSet<>();
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch =  FetchType.EAGER)
     @JoinColumn(name = "client_id", nullable = false)
     private Clients client;
 

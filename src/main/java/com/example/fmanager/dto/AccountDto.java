@@ -18,9 +18,8 @@ public class AccountDto {
     private Float balance;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private int clientId; // или ClientDTO для полной информации о клиенте
+    private int clientId;
     private Set<Integer> transactionIds;
-
 
     public static AccountDto convertToDto(Accounts account) {
         AccountDto dto = new AccountDto();
