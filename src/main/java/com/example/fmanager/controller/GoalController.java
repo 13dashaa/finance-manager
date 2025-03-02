@@ -1,9 +1,9 @@
 package com.example.fmanager.controller;
 
-import java.util.List;
 import com.example.fmanager.dto.GoalDto;
 import com.example.fmanager.models.Goals;
 import com.example.fmanager.service.GoalService;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -63,7 +63,6 @@ public class GoalController {
         GoalDto updatedGoal = goalService.updateGoal(id, goalDetails);
         return ResponseEntity.ok(updatedGoal);
     }
-
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {

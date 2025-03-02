@@ -1,5 +1,7 @@
 package com.example.fmanager.service;
 
+import static com.example.fmanager.service.AccountService.ACCOUNT_NOT_FOUND_MESSAGE;
+
 import com.example.fmanager.dto.TransactionDto;
 import com.example.fmanager.exception.ExceptionNotFound;
 import com.example.fmanager.models.Accounts;
@@ -15,7 +17,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class TransactionService {
     public static final String TRANSACTION_NOT_FOUND_MESSAGE = "Transaction not found";
-
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
     private final InMemoryCache cache;
@@ -39,7 +40,6 @@ public class TransactionService {
     public List<TransactionDto> findByClientIdAndCategoryId(int clientId, int categoryId) {
         String cacheKey = "transactions_client_" + clientId + "_category_" + categoryId;
         if (cache.containsKey(cacheKey)) {
-            System.out.println("used cache transactions_client_");
             return (List<TransactionDto>) cache.get(cacheKey);
         }
         List<Transactions> transactions = transactionRepository
@@ -66,7 +66,7 @@ public class TransactionService {
     public Transactions createTransaction(Transactions transaction) {
         Transactions savedTransaction = transactionRepository.save(transaction);
         Accounts account = accountRepository.findById(transaction.getAccount().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Account not found"));
+                .orElseThrow(() -> new IllegalArgumentException(ACCOUNT_NOT_FOUND_MESSAGE));
         clearCacheForClientAndCategory(account.getClient().getId(),
                savedTransaction.getCategory().getId());
         return savedTransaction;
@@ -79,11 +79,10 @@ public class TransactionService {
         transaction.setDescription(transactionDetails.getDescription());
         transaction.setAmount(transactionDetails.getAmount());
         transaction.setDate(transactionDetails.getDate());
-        //transaction.setAccount(transactionDetails.getAccount());
         transaction.setCategory(transactionDetails.getCategory());
         Transactions savedTransaction = transactionRepository.save(transaction);
         Accounts account = accountRepository.findById(transaction.getAccount().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Account not found"));
+                .orElseThrow(() -> new IllegalArgumentException(ACCOUNT_NOT_FOUND_MESSAGE));
         clearCacheForClientAndCategory(account.getClient().getId(),
                 savedTransaction.getCategory().getId());
         return TransactionDto.convertToDto(savedTransaction);
@@ -94,7 +93,7 @@ public class TransactionService {
         Transactions transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new ExceptionNotFound(TRANSACTION_NOT_FOUND_MESSAGE));
         Accounts account = accountRepository.findById(transaction.getAccount().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Account not found"));
+                .orElseThrow(() -> new IllegalArgumentException(ACCOUNT_NOT_FOUND_MESSAGE));
         clearCacheForClientAndCategory(account.getClient().getId(),
                 transaction.getCategory().getId());
         transactionRepository.delete(transaction);

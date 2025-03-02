@@ -1,23 +1,21 @@
 package com.example.fmanager.dto;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 import com.example.fmanager.models.Budgets;
 import com.example.fmanager.models.Categories;
 import com.example.fmanager.models.Transactions;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 public class CategoryDto {
-
     private int id;
     private String name;
     private Set<Integer> budgetIds;
     private Set<Integer> transactionIds;
-
 
     public static CategoryDto convertToDto(Categories category) {
         CategoryDto dto = new CategoryDto();
@@ -37,7 +35,6 @@ public class CategoryDto {
             dto.setTransactionIds(new HashSet<>());
         }
         dto.setName(category.getName());
-
         return dto;
     }
 }

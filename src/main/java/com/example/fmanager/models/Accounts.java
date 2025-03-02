@@ -1,8 +1,5 @@
 package com.example.fmanager.models;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,6 +10,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -38,7 +38,6 @@ public class Accounts {
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL,
             orphanRemoval = true)
     private Set<Transactions> transactions = new HashSet<>();
-
 
     @ManyToOne(fetch =  FetchType.EAGER)
     @JoinColumn(name = "client_id", nullable = false)

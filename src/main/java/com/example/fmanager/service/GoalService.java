@@ -1,14 +1,13 @@
 package com.example.fmanager.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import com.example.fmanager.dto.GoalDto;
-import com.example.fmanager.dto.TransactionDto;
 import com.example.fmanager.exception.ExceptionNotFound;
 import com.example.fmanager.models.Goals;
 import com.example.fmanager.repository.GoalRepository;
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -40,7 +39,6 @@ public class GoalService {
     public List<GoalDto> findByClientId(int clientId) {
         String cacheKey = "goals_client_" + clientId;
         if (cache.containsKey(cacheKey)) {
-            System.out.println("used cache goals_client_");
             return (List<GoalDto>) cache.get(cacheKey);
         }
         List<Goals> goals = goalRepository.findByClientId(clientId);

@@ -1,9 +1,9 @@
 package com.example.fmanager.controller;
 
-import java.util.List;
 import com.example.fmanager.dto.AccountDto;
 import com.example.fmanager.models.Accounts;
 import com.example.fmanager.service.AccountService;
+import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;

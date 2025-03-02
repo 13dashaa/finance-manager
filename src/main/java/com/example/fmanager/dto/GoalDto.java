@@ -1,8 +1,8 @@
 package com.example.fmanager.dto;
 
+import com.example.fmanager.models.Goals;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import com.example.fmanager.models.Goals;
 import lombok.Getter;
 import lombok.Setter;
 

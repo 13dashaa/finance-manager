@@ -1,14 +1,13 @@
 package com.example.fmanager.service;
 
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import com.example.fmanager.dto.BudgetDto;
 import com.example.fmanager.exception.ExceptionNotFound;
 import com.example.fmanager.models.Budgets;
 import com.example.fmanager.repository.BudgetRepository;
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -45,7 +44,7 @@ public class BudgetService {
                 .orElseThrow(() -> new ExceptionNotFound(BUDGET_NOT_FOUND_MESSAGE));
         budget.setPeriod(budgetDetails.getPeriod());
         budget.setLimitation(budgetDetails.getLimitation());
-        budget.setClients(budgetDetails.getClients()); // Обновление клиентов
+        budget.setClients(budgetDetails.getClients());
         budget.setCategory(budgetDetails.getCategory());
         return BudgetDto.convertToDto(budgetRepository.save(budget));
     }

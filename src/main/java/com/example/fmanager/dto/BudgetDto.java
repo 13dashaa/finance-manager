@@ -1,11 +1,11 @@
 package com.example.fmanager.dto;
 
+import com.example.fmanager.models.Budgets;
+import com.example.fmanager.models.Clients;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-import com.example.fmanager.models.Budgets;
-import com.example.fmanager.models.Clients;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,7 +20,6 @@ public class BudgetDto {
     private int period;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
 
     public static BudgetDto convertToDto(Budgets budget) {
         BudgetDto dto = new BudgetDto();
