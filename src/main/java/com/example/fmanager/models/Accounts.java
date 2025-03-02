@@ -42,5 +42,4 @@ public class Accounts {
     @ManyToOne(fetch =  FetchType.EAGER)
     @JoinColumn(name = "client_id", nullable = false)
     private Clients client;
-
 }

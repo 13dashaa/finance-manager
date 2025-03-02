@@ -36,5 +36,4 @@ public class Transactions {
     private LocalDateTime date;
     @CreationTimestamp
     private LocalDateTime createdAt;
-
 }
