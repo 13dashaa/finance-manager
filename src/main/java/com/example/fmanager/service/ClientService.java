@@ -1,5 +1,7 @@
 package com.example.fmanager.service;
 
+import static com.example.fmanager.exception.NotFoundMessages.CLIENT_NOT_FOUND_MESSAGE;
+
 import com.example.fmanager.dto.ClientDto;
 import com.example.fmanager.exception.ExceptionNotFound;
 import com.example.fmanager.models.Clients;
@@ -12,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ClientService {
-
     private ClientRepository clientRepository;
 
     public ClientService(ClientRepository userRepository) {
@@ -30,7 +31,7 @@ public class ClientService {
 
     public Optional<ClientDto> findById(int id) {
         Clients client = clientRepository.findById(id)
-                .orElseThrow(() -> new ExceptionNotFound("Client not found"));
+                .orElseThrow(() -> new ExceptionNotFound(CLIENT_NOT_FOUND_MESSAGE));
         return Optional.of(ClientDto.convertToDto(client));
     }
 
@@ -41,7 +42,7 @@ public class ClientService {
     @Transactional
     public ClientDto updateUser(int id, Clients userDetails) {
         Clients user = clientRepository.findById(id)
-                .orElseThrow(() -> new ExceptionNotFound("User not found"));
+                .orElseThrow(() -> new ExceptionNotFound(CLIENT_NOT_FOUND_MESSAGE));
         user.setUsername(userDetails.getUsername());
         user.setPassword(userDetails.getPassword());
         user.setEmail(userDetails.getEmail());
@@ -53,7 +54,7 @@ public class ClientService {
     @Transactional
     public void deleteUser(int id) {
         Clients user = clientRepository.findById(id)
-                .orElseThrow(() -> new ExceptionNotFound("User not found"));
+                .orElseThrow(() -> new ExceptionNotFound(CLIENT_NOT_FOUND_MESSAGE));
         clientRepository.delete(user);
     }
 }

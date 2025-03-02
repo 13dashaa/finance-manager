@@ -1,6 +1,5 @@
 package com.example.fmanager.models;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -37,5 +36,4 @@ public class Transactions {
     private LocalDateTime date;
     @CreationTimestamp
     private LocalDateTime createdAt;
-
 }

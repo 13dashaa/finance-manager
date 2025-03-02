@@ -39,7 +39,6 @@ public class Accounts {
                orphanRemoval = true)
     private Set<Transactions> transactions = new HashSet<>();
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = false)
     private Clients client;

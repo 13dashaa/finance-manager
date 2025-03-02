@@ -18,7 +18,6 @@ import lombok.Setter;
 @Setter
 
 public class Goals {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;

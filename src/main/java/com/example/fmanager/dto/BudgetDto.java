@@ -21,7 +21,6 @@ public class BudgetDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-
     public static BudgetDto convertToDto(Budgets budget) {
         BudgetDto dto = new BudgetDto();
         dto.setId(budget.getId());

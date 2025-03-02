@@ -1,5 +1,6 @@
 package com.example.fmanager.service;
 
+import static com.example.fmanager.exception.NotFoundMessages.BUDGET_NOT_FOUND_MESSAGE;
 
 import com.example.fmanager.dto.BudgetDto;
 import com.example.fmanager.exception.ExceptionNotFound;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class BudgetService {
-    public static final String BUDGET_NOT_FOUND_MESSAGE = "Budget not found";
     private BudgetRepository budgetRepository;
 
     public BudgetService(BudgetRepository budgetRepository) {

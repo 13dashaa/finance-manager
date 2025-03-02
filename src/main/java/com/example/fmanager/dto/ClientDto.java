@@ -13,12 +13,11 @@ import lombok.Setter;
 @Setter
 public class ClientDto {
 
-    private int id;                // Идентификатор клиента
-    private String username;       // Имя пользователя
-    private String email;          // Электронная почта
+    private int id;
+    private String username;
+    private String email;
     private Set<Integer> budgetIds;
     private Set<Integer> accountIds;
-
 
     public static ClientDto convertToDto(Clients client) {
         ClientDto dto = new ClientDto();

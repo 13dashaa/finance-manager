@@ -1,5 +1,7 @@
 package com.example.fmanager.service;
 
+import static com.example.fmanager.exception.NotFoundMessages.ACCOUNT_NOT_FOUND_MESSAGE;
+
 import com.example.fmanager.dto.AccountDto;
 import com.example.fmanager.exception.ExceptionNotFound;
 import com.example.fmanager.models.Accounts;
@@ -12,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AccountService {
-    public static final String ACCOUNT_NOT_FOUND_MESSAGE = "Account not found";
     private AccountRepository accountRepository;
 
     public AccountService(AccountRepository accountRepository) {
@@ -24,7 +25,6 @@ public class AccountService {
                 .orElseThrow(() -> new ExceptionNotFound(ACCOUNT_NOT_FOUND_MESSAGE));
         return Optional.of(AccountDto.convertToDto(account));
     }
-
 
     public List<AccountDto> getAllAccounts() {
         List<Accounts> accounts = accountRepository.findAll();

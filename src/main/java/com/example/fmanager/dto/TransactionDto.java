@@ -8,14 +8,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class TransactionDto {
-    private int id;                // Идентификатор транзакции
-    private String description;     // Описание транзакции
-    private Float amount;          // Сумма транзакции
-    private int accountId;         // Идентификатор аккаунта
-    private int categoryId;        // Идентификатор категории
-    private LocalDateTime date;    // Дата транзакции
-    private LocalDateTime createdAt; // Временная метка создания
-
+    private int id;
+    private String description;
+    private Float amount;
+    private int accountId;
+    private int categoryId;
+    private LocalDateTime date;
+    private LocalDateTime createdAt;
 
     public static TransactionDto convertToDto(Transactions transaction) {
         TransactionDto dto = new TransactionDto();

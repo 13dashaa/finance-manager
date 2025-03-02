@@ -1,5 +1,7 @@
 package com.example.fmanager.service;
 
+import static com.example.fmanager.exception.NotFoundMessages.GOAL_NOT_FOUND_MESSAGE;
+
 import com.example.fmanager.dto.GoalDto;
 import com.example.fmanager.exception.ExceptionNotFound;
 import com.example.fmanager.models.Goals;
@@ -12,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class GoalService {
-    public static final String GOAL_NOT_FOUND_MESSAGE = "Goal not found";
     private GoalRepository goalRepository;
 
     public GoalService(GoalRepository goalRepository) {
@@ -24,7 +25,6 @@ public class GoalService {
                 .orElseThrow(() -> new ExceptionNotFound(GOAL_NOT_FOUND_MESSAGE));
         return Optional.of(GoalDto.convertToDto(goal));
     }
-
 
     public List<GoalDto> getAllGoals() {
         List<Goals> goals = goalRepository.findAll();

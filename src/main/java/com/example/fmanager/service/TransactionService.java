@@ -1,5 +1,7 @@
 package com.example.fmanager.service;
 
+import static com.example.fmanager.exception.NotFoundMessages.TRANSACTION_NOT_FOUND_MESSAGE;
+
 import com.example.fmanager.dto.TransactionDto;
 import com.example.fmanager.exception.ExceptionNotFound;
 import com.example.fmanager.models.Transactions;
@@ -12,8 +14,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TransactionService {
-    public static final String TRANSACTION_NOT_FOUND_MESSAGE = "Transaction not found";
-
     private TransactionRepository transactionRepository;
 
     public TransactionService(TransactionRepository transactionRepository) {

@@ -18,7 +18,6 @@ public class CategoryDto {
     private Set<Integer> budgetIds;
     private Set<Integer> transactionIds;
 
-
     public static CategoryDto convertToDto(Categories category) {
         CategoryDto dto = new CategoryDto();
         dto.setId(category.getId());
@@ -37,7 +36,6 @@ public class CategoryDto {
             dto.setTransactionIds(new HashSet<>());
         }
         dto.setName(category.getName());
-
         return dto;
     }
 }

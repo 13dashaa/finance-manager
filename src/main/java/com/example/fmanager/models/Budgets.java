@@ -16,12 +16,9 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-
 @Getter
 @Setter
 @Entity
-
-
 public class Budgets {
 
     @Id
@@ -40,7 +37,6 @@ public class Budgets {
     @JoinColumn(name = "category_id", nullable = false)
     private Categories category;
 
-
     @Column(nullable = false)
     private Float limitation;
     @Column
@@ -49,6 +45,4 @@ public class Budgets {
     private LocalDateTime createdAt;
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-
 }
