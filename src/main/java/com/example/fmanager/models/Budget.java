@@ -20,9 +20,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Getter
 @Setter
 @Entity
-@Table(name = "budgets")
 public class Budget {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -34,11 +32,9 @@ public class Budget {
             inverseJoinColumns = @JoinColumn(name = "client_id")
     )
     private Set<Client> clients;
-
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
-
     @Column(nullable = false)
     private Float limitation;
     @Column

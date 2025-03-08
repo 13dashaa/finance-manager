@@ -45,7 +45,7 @@ public class BudgetService {
                 .orElseThrow(() -> new ExceptionNotFound(BUDGET_NOT_FOUND_MESSAGE));
         budget.setPeriod(budgetDetails.getPeriod());
         budget.setLimitation(budgetDetails.getLimitation());
-        budget.setClients(budgetDetails.getClients()); // Обновление клиентов
+        budget.setClients(budgetDetails.getClients());
         budget.setCategory(budgetDetails.getCategory());
         return BudgetDto.convertToDto(budgetRepository.save(budget));
     }

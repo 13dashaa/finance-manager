@@ -52,6 +52,14 @@ public class TransactionController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/filter")
+    public List<TransactionDto> getTransactionsByClientAndCategory(
+            @RequestParam int clientId,
+            @RequestParam int categoryId
+    ) {
+        return transactionService.findByClientIdAndCategoryId(clientId, categoryId);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<TransactionDto> updateTransaction(
             @PathVariable int id,
