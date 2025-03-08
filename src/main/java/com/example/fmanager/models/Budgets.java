@@ -32,11 +32,9 @@ public class Budgets {
             inverseJoinColumns = @JoinColumn(name = "client_id")
     )
     private Set<Clients> clients;
-
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Categories category;
-
     @Column(nullable = false)
     private Float limitation;
     @Column

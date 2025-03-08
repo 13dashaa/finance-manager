@@ -6,6 +6,7 @@ import com.example.fmanager.dto.AccountDto;
 import com.example.fmanager.exception.ExceptionNotFound;
 import com.example.fmanager.models.Accounts;
 import com.example.fmanager.repository.AccountRepository;
+import com.example.fmanager.repository.CategoryRepository;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,10 +15,19 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AccountService {
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
+    private final CategoryRepository categoryRepository;
+    private final TransactionService transactionService;
+    private final InMemoryCache cache;
 
-    public AccountService(AccountRepository accountRepository) {
+    public AccountService(AccountRepository accountRepository,
+                          InMemoryCache cache,
+                          CategoryRepository categoryRepository,
+                          TransactionService transactionService) {
         this.accountRepository = accountRepository;
+        this.categoryRepository = categoryRepository;
+        this.transactionService = transactionService;
+        this.cache = cache;
     }
 
     public Optional<AccountDto> getAccountById(int id) {
@@ -25,6 +35,7 @@ public class AccountService {
                 .orElseThrow(() -> new ExceptionNotFound(ACCOUNT_NOT_FOUND_MESSAGE));
         return Optional.of(AccountDto.convertToDto(account));
     }
+
 
     public List<AccountDto> getAllAccounts() {
         List<Accounts> accounts = accountRepository.findAll();
@@ -35,8 +46,37 @@ public class AccountService {
         return accountDtos;
     }
 
+    public List<AccountDto> findByClientId(int clientId) {
+        String cacheKey = "accounts_client_" + clientId;
+        if (cache.containsKey(cacheKey)) {
+            return (List<AccountDto>) cache.get(cacheKey);
+        }
+        List<Accounts> accounts = accountRepository.findAllByClientId(clientId);
+        List<AccountDto> accountDtos = new ArrayList<>();
+        for (Accounts account : accounts) {
+            accountDtos.add(AccountDto.convertToDto(account));
+        }
+        cache.put(cacheKey, accountDtos);
+        return accountDtos;
+    }
+
+    public void clearCacheForClient(int clientId) {
+        String cacheKey = "accounts_client_" + clientId;
+        cache.remove(cacheKey);
+    }
+
     public Accounts createAccount(Accounts account) {
-        return accountRepository.save(account);
+        Accounts savedAccount = accountRepository.save(account);
+        List<Integer> categoryIds = categoryRepository.findCategoryIdsByClientId(
+                savedAccount.getClient().getId()
+        );
+        for (Integer categoryId : categoryIds) {
+            transactionService.clearCacheForClientAndCategory(
+                    savedAccount.getClient().getId(), categoryId
+            );
+        }
+        clearCacheForClient(savedAccount.getClient().getId());
+        return savedAccount;
     }
 
     @Transactional
@@ -45,15 +85,16 @@ public class AccountService {
                 .orElseThrow(() -> new ExceptionNotFound(ACCOUNT_NOT_FOUND_MESSAGE));
         account.setName(accountDetails.getName());
         account.setBalance(accountDetails.getBalance());
-        account.setClient(accountDetails.getClient());
-        account.setTransactions(accountDetails.getTransactions());
-        return AccountDto.convertToDto(accountRepository.save(account));
+        Accounts savedAccount = accountRepository.save(account);
+        clearCacheForClient(savedAccount.getClient().getId());
+        return AccountDto.convertToDto(savedAccount);
     }
 
     @Transactional
     public void deleteAccount(int id) {
         Accounts account = accountRepository.findById(id)
                 .orElseThrow(() -> new ExceptionNotFound(ACCOUNT_NOT_FOUND_MESSAGE));
+        clearCacheForClient(account.getClient().getId());
         accountRepository.delete(account);
     }
 }

@@ -52,6 +52,11 @@ public class AccountController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/filter")
+    public List<AccountDto> getAccountsByClient(@RequestParam int clientId) {
+        return  accountService.findByClientId(clientId);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<AccountDto> updateAccount(@PathVariable int id,
                                                     @RequestBody Accounts accountDetails) {

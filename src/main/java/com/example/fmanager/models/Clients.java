@@ -30,7 +30,7 @@ public class Clients {
     private String username;
     @Column(name = "email", unique = true, nullable = false)
     private String email;
-    @Column(name =  "password", nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -38,7 +38,7 @@ public class Clients {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "client", fetch = FetchType.LAZY,
-               cascade = CascadeType.ALL, orphanRemoval = true)
+            cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Accounts> accounts;
 
     @OneToMany(mappedBy = "client", fetch = FetchType.LAZY,

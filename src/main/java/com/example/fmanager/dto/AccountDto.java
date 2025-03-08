@@ -27,8 +27,8 @@ public class AccountDto {
         Set<Transactions> transactions = account.getTransactions();
         if (transactions != null) {
             dto.setTransactionIds(account.getTransactions().stream()
-                .map(Transactions::getId)
-                .collect(Collectors.toSet()));
+                    .map(Transactions::getId)
+                    .collect(Collectors.toSet()));
         } else {
             dto.setTransactionIds(new HashSet<>());
         }
