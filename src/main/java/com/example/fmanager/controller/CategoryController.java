@@ -1,7 +1,7 @@
 package com.example.fmanager.controller;
 
 import com.example.fmanager.dto.CategoryDto;
-import com.example.fmanager.models.Categories;
+import com.example.fmanager.models.Category;
 import com.example.fmanager.service.CategoryService;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +26,7 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<CategoryDto> createCategory(@RequestBody Categories category) {
+    public ResponseEntity<CategoryDto> createCategory(@RequestBody Category category) {
         categoryService.createCategory(category);
         return categoryService
                 .findById(category.getId())
@@ -54,7 +54,7 @@ public class CategoryController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CategoryDto> updateCategory(@PathVariable int id,
-                                                      @RequestBody Categories categoryDetails) {
+                                                      @RequestBody Category categoryDetails) {
         CategoryDto updatedCategory = categoryService.updateCategory(id, categoryDetails);
         return ResponseEntity.ok(updatedCategory);
     }

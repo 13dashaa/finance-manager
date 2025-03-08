@@ -1,7 +1,7 @@
 package com.example.fmanager.controller;
 
 import com.example.fmanager.dto.ClientDto;
-import com.example.fmanager.models.Clients;
+import com.example.fmanager.models.Client;
 import com.example.fmanager.service.ClientService;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +26,7 @@ public class ClientController {
     }
 
     @PostMapping
-    public ResponseEntity<ClientDto> createUser(@RequestBody Clients client) {
+    public ResponseEntity<ClientDto> createUser(@RequestBody Client client) {
         clientService.createUser(client);
         return clientService
                 .findById(client.getId())
@@ -54,7 +54,7 @@ public class ClientController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ClientDto> updateClient(@PathVariable int id,
-                                                  @RequestBody Clients clientDetails) {
+                                                  @RequestBody Client clientDetails) {
         ClientDto updatedClient = clientService.updateUser(id, clientDetails);
         return ResponseEntity.ok(updatedClient);
     }

@@ -1,7 +1,7 @@
 package com.example.fmanager.controller;
 
 import com.example.fmanager.dto.GoalDto;
-import com.example.fmanager.models.Goals;
+import com.example.fmanager.models.Goal;
 import com.example.fmanager.service.GoalService;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +25,7 @@ public class GoalController {
     }
 
     @PostMapping
-    public ResponseEntity<GoalDto> createCategory(@RequestBody Goals golas) {
+    public ResponseEntity<GoalDto> createCategory(@RequestBody Goal golas) {
         goalService.createGoal(golas);
         return goalService
                 .getGoalById(golas.getId())
@@ -53,7 +53,7 @@ public class GoalController {
 
     @PutMapping("/{id}")
     public ResponseEntity<GoalDto> updateGoal(@PathVariable int id,
-                                                      @RequestBody Goals goalDetails) {
+                                                      @RequestBody Goal goalDetails) {
         GoalDto updatedGoal = goalService.updateGoal(id, goalDetails);
         return ResponseEntity.ok(updatedGoal);
     }

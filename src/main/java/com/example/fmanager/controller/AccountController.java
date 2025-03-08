@@ -1,7 +1,7 @@
 package com.example.fmanager.controller;
 
 import com.example.fmanager.dto.AccountDto;
-import com.example.fmanager.models.Accounts;
+import com.example.fmanager.models.Account;
 import com.example.fmanager.service.AccountService;
 import java.util.List;
 import org.springframework.http.MediaType;
@@ -28,7 +28,7 @@ public class AccountController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 
-    public ResponseEntity<AccountDto> createAccount(@RequestBody Accounts account) {
+    public ResponseEntity<AccountDto> createAccount(@RequestBody Account account) {
         accountService.createAccount(account);
         return accountService
                 .getAccountById(account.getId())
@@ -54,7 +54,7 @@ public class AccountController {
 
     @PutMapping("/{id}")
     public ResponseEntity<AccountDto> updateAccount(@PathVariable int id,
-                                                    @RequestBody Accounts accountDetails) {
+                                                    @RequestBody Account accountDetails) {
         AccountDto updatedAccount = accountService.updateAccount(id, accountDetails);
         return ResponseEntity.ok(updatedAccount);
     }

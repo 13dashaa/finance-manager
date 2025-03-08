@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,14 +15,15 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-public class Categories {
+@Table(name = "categories")
+public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column
     private String name;
     @OneToMany(mappedBy = "category", fetch = FetchType.EAGER)
-    private Set<Budgets> budgets;
+    private Set<Budget> budgets;
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
-    private Set<Transactions> transactions;
+    private Set<Transaction> transactions;
 }

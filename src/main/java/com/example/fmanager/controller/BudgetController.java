@@ -1,7 +1,7 @@
 package com.example.fmanager.controller;
 
 import com.example.fmanager.dto.BudgetDto;
-import com.example.fmanager.models.Budgets;
+import com.example.fmanager.models.Budget;
 import com.example.fmanager.service.BudgetService;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +26,7 @@ public class BudgetController {
     }
 
     @PostMapping
-    public ResponseEntity<BudgetDto> createBudget(@RequestBody Budgets budget) {
+    public ResponseEntity<BudgetDto> createBudget(@RequestBody Budget budget) {
         budgetService.createBudget(budget);
         return budgetService
                 .getBudgetById(budget.getId())
@@ -57,7 +57,7 @@ public class BudgetController {
 
     @PutMapping("/{id}")
     public ResponseEntity<BudgetDto> updateBudget(@PathVariable int id,
-                                                  @RequestBody Budgets budgetDetails) {
+                                                  @RequestBody Budget budgetDetails) {
         BudgetDto updatedBudget = budgetService.updateBudget(id, budgetDetails);
         return ResponseEntity.ok(updatedBudget);
     }

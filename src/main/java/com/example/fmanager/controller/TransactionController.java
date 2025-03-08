@@ -1,7 +1,7 @@
 package com.example.fmanager.controller;
 
 import com.example.fmanager.dto.TransactionDto;
-import com.example.fmanager.models.Transactions;
+import com.example.fmanager.models.Transaction;
 import com.example.fmanager.service.TransactionService;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,7 +28,7 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<TransactionDto> createTransaction(@RequestBody Transactions transaction) {
+    public ResponseEntity<TransactionDto> createTransaction(@RequestBody Transaction transaction) {
         transactionService.createTransaction(transaction);
         return transactionService
                 .getTransactionById(transaction.getId())
@@ -55,7 +55,7 @@ public class TransactionController {
     @PutMapping("/{id}")
     public ResponseEntity<TransactionDto> updateTransaction(
             @PathVariable int id,
-            @RequestBody Transactions transactionDetails) {
+            @RequestBody Transaction transactionDetails) {
         TransactionDto updatedTransaction = transactionService.updateTransaction(id,
                 transactionDetails);
         return ResponseEntity.ok(updatedTransaction);

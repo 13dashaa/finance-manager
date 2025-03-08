@@ -1,6 +1,6 @@
 package com.example.fmanager.dto;
 
-import com.example.fmanager.models.Goals;
+import com.example.fmanager.models.Goal;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.Getter;
@@ -17,7 +17,7 @@ public class GoalDto {
     private LocalDate endDate;
     private int clientId;
 
-    public static GoalDto convertToDto(Goals goal) {
+    public static GoalDto convertToDto(Goal goal) {
         GoalDto dto = new GoalDto();
         dto.setId(goal.getId());
         dto.setClientId(goal.getClient().getId());

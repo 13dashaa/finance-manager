@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PreRemove;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.Set;
 import lombok.Getter;
@@ -20,7 +21,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Getter
 @Setter
 @Entity
-public class Clients {
+@Table(name = "clients")
+public class Client {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,17 +41,17 @@ public class Clients {
 
     @OneToMany(mappedBy = "client", fetch = FetchType.LAZY,
                cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Accounts> accounts;
+    private Set<Account> accounts;
 
     @OneToMany(mappedBy = "client", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Goals> goals;
+    private Set<Goal> goals;
     @ManyToMany(mappedBy = "clients")
-    private Set<Budgets> budgets;
+    private Set<Budget> budgets;
 
     @PreRemove
     private void removeUserFromBudgets() {
-        for (Budgets budget : budgets) {
+        for (Budget budget : budgets) {
             budget.getClients().remove(this);
         }
     }

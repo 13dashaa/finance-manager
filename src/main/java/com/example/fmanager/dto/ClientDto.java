@@ -1,8 +1,8 @@
 package com.example.fmanager.dto;
 
-import com.example.fmanager.models.Accounts;
-import com.example.fmanager.models.Budgets;
-import com.example.fmanager.models.Clients;
+import com.example.fmanager.models.Account;
+import com.example.fmanager.models.Budget;
+import com.example.fmanager.models.Client;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,23 +19,23 @@ public class ClientDto {
     private Set<Integer> budgetIds;
     private Set<Integer> accountIds;
 
-    public static ClientDto convertToDto(Clients client) {
+    public static ClientDto convertToDto(Client client) {
         ClientDto dto = new ClientDto();
         dto.setId(client.getId());
-        Set<Accounts> accounts = client.getAccounts();
+        Set<Account> accounts = client.getAccounts();
         if (accounts != null) {
             dto.setAccountIds(client.getAccounts().stream()
-                    .map(Accounts::getId)
+                    .map(Account::getId)
                     .collect(Collectors.toSet()));
         } else {
             dto.setAccountIds(new HashSet<>());
         }
         dto.setUsername(client.getUsername());
         dto.setEmail(client.getEmail());
-        Set<Budgets> budgets = client.getBudgets();
+        Set<Budget> budgets = client.getBudgets();
         if (budgets != null) {
             dto.setBudgetIds(client.getBudgets().stream()
-                    .map(Budgets::getId)
+                    .map(Budget::getId)
                     .collect(Collectors.toSet()));
         } else {
             dto.setBudgetIds(new HashSet<>());

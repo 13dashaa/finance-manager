@@ -8,32 +8,31 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDateTime;
+import jakarta.persistence.Table;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
 
+@Entity
 @Getter
 @Setter
-@Entity
-public class Transactions {
+@Table(name = "goals")
+public class Goal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column
-    private String description;
-    @Column(nullable = false)
-    private Float amount;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id", nullable = false)
-    private Accounts account;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    private Categories category;
+    private String name;
     @Column
-    private LocalDateTime date;
-    @CreationTimestamp
-    private LocalDateTime createdAt;
+    private BigDecimal targetAmount;
+    @Column
+    private BigDecimal currentAmount = BigDecimal.ZERO;
+    @Column
+    private LocalDate startDate;
+    @Column
+    private LocalDate endDate;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "client_id", nullable = false)
+    private Client client;
 }
