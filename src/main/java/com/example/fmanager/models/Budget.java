@@ -20,11 +20,11 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Getter
 @Setter
 @Entity
+@Table(name = "budgets")
 public class Budget {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
     @ManyToMany
     @JoinTable(
             name = "client_budgets",

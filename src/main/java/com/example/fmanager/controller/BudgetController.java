@@ -1,9 +1,11 @@
 package com.example.fmanager.controller;
 
-import com.example.fmanager.dto.BudgetDto;
+import com.example.fmanager.dto.BudgetCreateDto;
+import com.example.fmanager.dto.BudgetGetDto;
 import com.example.fmanager.models.Budget;
 import com.example.fmanager.service.BudgetService;
 import java.util.List;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,8 +28,8 @@ public class BudgetController {
     }
 
     @PostMapping
-    public ResponseEntity<BudgetDto> createBudget(@RequestBody Budget budget) {
-        budgetService.createBudget(budget);
+    public ResponseEntity<BudgetGetDto> createBudget(@Valid @RequestBody BudgetCreateDto budgetCreateDto) {
+        Budget budget = budgetService.createBudget(budgetCreateDto);
         return budgetService
                 .getBudgetById(budget.getId())
                 .map(ResponseEntity::ok)
@@ -35,7 +37,7 @@ public class BudgetController {
     }
 
     @GetMapping
-    public List<BudgetDto> filterBudgets(
+    public List<BudgetGetDto> filterBudgets(
             @RequestParam(required = false) Integer userId,
             @RequestParam(required = false) Integer categoryId,
             @RequestParam(required = false) Float limit) {
@@ -43,7 +45,7 @@ public class BudgetController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BudgetDto> getBudget(@PathVariable int id) {
+    public ResponseEntity<BudgetGetDto> getBudget(@PathVariable int id) {
         return budgetService
                 .getBudgetById(id)
                 .map(ResponseEntity::ok)
@@ -56,9 +58,9 @@ public class BudgetController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BudgetDto> updateBudget(@PathVariable int id,
-                                                  @RequestBody Budget budgetDetails) {
-        BudgetDto updatedBudget = budgetService.updateBudget(id, budgetDetails);
+    public ResponseEntity<BudgetGetDto> updateBudget(@PathVariable int id,
+                                                     @RequestBody Budget budgetDetails) {
+        BudgetGetDto updatedBudget = budgetService.updateBudget(id, budgetDetails);
         return ResponseEntity.ok(updatedBudget);
     }
 

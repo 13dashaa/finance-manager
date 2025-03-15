@@ -11,7 +11,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class BudgetDto {
+public class BudgetGetDto {
 
     private int id;
     private Set<Integer> clientIds;
@@ -21,8 +21,8 @@ public class BudgetDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public static BudgetDto convertToDto(Budget budget) {
-        BudgetDto dto = new BudgetDto();
+    public static BudgetGetDto convertToDto(Budget budget) {
+        BudgetGetDto dto = new BudgetGetDto();
         dto.setId(budget.getId());
         Set<Client> clients = budget.getClients();
         if (clients != null) {

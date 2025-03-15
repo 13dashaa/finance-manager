@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface GoalRepository extends JpaRepository<Goal, Integer> {
-
     @Query("SELECT g FROM Goal g JOIN g.client c WHERE c.id = :clientId")
     List<Goal> findByClientId(@Param("clientId") int clientId);
 }

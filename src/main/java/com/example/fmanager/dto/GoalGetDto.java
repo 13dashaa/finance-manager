@@ -8,7 +8,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class GoalDto {
+public class GoalGetDto {
     private int id;
     private String name;
     private BigDecimal targetAmount;
@@ -17,8 +17,8 @@ public class GoalDto {
     private LocalDate endDate;
     private int clientId;
 
-    public static GoalDto convertToDto(Goal goal) {
-        GoalDto dto = new GoalDto();
+    public static GoalGetDto convertToDto(Goal goal) {
+        GoalGetDto dto = new GoalGetDto();
         dto.setId(goal.getId());
         dto.setClientId(goal.getClient().getId());
         dto.setName(goal.getName());

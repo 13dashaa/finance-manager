@@ -1,10 +1,12 @@
 package com.example.fmanager.controller;
 
-import com.example.fmanager.dto.TransactionDto;
+import com.example.fmanager.dto.TransactionCreateDto;
+import com.example.fmanager.dto.TransactionGetDto;
 import com.example.fmanager.models.Transaction;
 import com.example.fmanager.service.TransactionService;
 import java.time.LocalDateTime;
 import java.util.List;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -28,8 +30,8 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<TransactionDto> createTransaction(@RequestBody Transaction transaction) {
-        transactionService.createTransaction(transaction);
+    public ResponseEntity<TransactionGetDto> createTransaction(@Valid @RequestBody TransactionCreateDto transactionCreateDto) {
+        Transaction transaction = transactionService.createTransaction(transactionCreateDto);
         return transactionService
                 .getTransactionById(transaction.getId())
                 .map(ResponseEntity::ok)
@@ -37,7 +39,7 @@ public class TransactionController {
     }
 
     @GetMapping
-    public List<TransactionDto> filterBudgets(
+    public List<TransactionGetDto> filterBudgets(
             @RequestParam(required = false) Integer userId,
             @RequestParam(required = false) Integer categoryId,
             @RequestParam(required = false) LocalDateTime date) {
@@ -45,7 +47,7 @@ public class TransactionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TransactionDto> getTransaction(@PathVariable int id) {
+    public ResponseEntity<TransactionGetDto> getTransaction(@PathVariable int id) {
         return transactionService
                 .getTransactionById(id)
                 .map(ResponseEntity::ok)
@@ -53,7 +55,7 @@ public class TransactionController {
     }
 
     @GetMapping("/filter")
-    public List<TransactionDto> getTransactionsByClientAndCategory(
+    public List<TransactionGetDto> getTransactionsByClientAndCategory(
             @RequestParam int clientId,
             @RequestParam int categoryId
     ) {
@@ -61,10 +63,10 @@ public class TransactionController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TransactionDto> updateTransaction(
+    public ResponseEntity<TransactionGetDto> updateTransaction(
             @PathVariable int id,
             @RequestBody Transaction transactionDetails) {
-        TransactionDto updatedTransaction = transactionService.updateTransaction(id,
+        TransactionGetDto updatedTransaction = transactionService.updateTransaction(id,
                 transactionDetails);
         return ResponseEntity.ok(updatedTransaction);
     }

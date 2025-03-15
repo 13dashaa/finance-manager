@@ -1,9 +1,11 @@
 package com.example.fmanager.controller;
 
-import com.example.fmanager.dto.CategoryDto;
+import com.example.fmanager.dto.CategoryCreateDto;
+import com.example.fmanager.dto.CategoryGetDto;
 import com.example.fmanager.models.Category;
 import com.example.fmanager.service.CategoryService;
 import java.util.List;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,8 +28,8 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<CategoryDto> createCategory(@RequestBody Category category) {
-        categoryService.createCategory(category);
+    public ResponseEntity<CategoryGetDto> createCategory(@Valid @RequestBody CategoryCreateDto categoryCreateDto) {
+        Category category = categoryService.createCategory(categoryCreateDto);
         return categoryService
                 .findById(category.getId())
                 .map(ResponseEntity::ok)
@@ -35,12 +37,12 @@ public class CategoryController {
     }
 
     @GetMapping
-    public List<CategoryDto> getCategories() {
+    public List<CategoryGetDto> getCategories() {
         return categoryService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryDto> getCategoryById(@PathVariable int id) {
+    public ResponseEntity<CategoryGetDto> getCategoryById(@PathVariable int id) {
         return categoryService
                 .findById(id)
                 .map(ResponseEntity::ok)
@@ -53,9 +55,9 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryDto> updateCategory(@PathVariable int id,
-                                                      @RequestBody Category categoryDetails) {
-        CategoryDto updatedCategory = categoryService.updateCategory(id, categoryDetails);
+    public ResponseEntity<CategoryGetDto> updateCategory(@PathVariable int id,
+                                                         @RequestBody Category categoryDetails) {
+        CategoryGetDto updatedCategory = categoryService.updateCategory(id, categoryDetails);
         return ResponseEntity.ok(updatedCategory);
     }
 

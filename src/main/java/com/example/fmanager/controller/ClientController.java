@@ -1,9 +1,11 @@
 package com.example.fmanager.controller;
 
-import com.example.fmanager.dto.ClientDto;
+import com.example.fmanager.dto.ClientCreateDto;
+import com.example.fmanager.dto.ClientGetDto;
 import com.example.fmanager.models.Client;
 import com.example.fmanager.service.ClientService;
 import java.util.List;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,8 +28,8 @@ public class ClientController {
     }
 
     @PostMapping
-    public ResponseEntity<ClientDto> createUser(@RequestBody Client client) {
-        clientService.createUser(client);
+    public ResponseEntity<ClientGetDto> createUser(@Valid @RequestBody ClientCreateDto clientCreateDto) {
+        Client client = clientService.createUser(clientCreateDto);
         return clientService
                 .findById(client.getId())
                 .map(ResponseEntity::ok)
@@ -35,12 +37,12 @@ public class ClientController {
     }
 
     @GetMapping
-    public List<ClientDto> getClients() {
+    public List<ClientGetDto> getClients() {
         return clientService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ClientDto> getClientById(@PathVariable int id) {
+    public ResponseEntity<ClientGetDto> getClientById(@PathVariable int id) {
         return clientService
                 .findById(id)
                 .map(ResponseEntity::ok)
@@ -53,9 +55,9 @@ public class ClientController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ClientDto> updateClient(@PathVariable int id,
-                                                  @RequestBody Client clientDetails) {
-        ClientDto updatedClient = clientService.updateUser(id, clientDetails);
+    public ResponseEntity<ClientGetDto> updateClient(@PathVariable int id,
+                                                     @RequestBody Client clientDetails) {
+        ClientGetDto updatedClient = clientService.updateUser(id, clientDetails);
         return ResponseEntity.ok(updatedClient);
     }
 

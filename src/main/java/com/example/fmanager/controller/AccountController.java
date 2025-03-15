@@ -1,9 +1,16 @@
 package com.example.fmanager.controller;
 
-import com.example.fmanager.dto.AccountDto;
+import com.example.fmanager.dto.AccountCreateDto;
+import com.example.fmanager.dto.AccountGetDto;
 import com.example.fmanager.models.Account;
 import com.example.fmanager.service.AccountService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,8 +24,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+
 @RestController
 @RequestMapping("/accounts")
+@Tag(name = "Account Management", description = "APIs for managing accounts")
 public class AccountController {
     private final AccountService accountService;
 
@@ -27,25 +36,39 @@ public class AccountController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-
-    public ResponseEntity<AccountDto> createAccount(@RequestBody Account account) {
-        accountService.createAccount(account);
+    @Operation(summary = "Create a new account", description = "Creates a new account with the provided details")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Account created successfully"),
+            @ApiResponse(responseCode = "404", description = "Account not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid input")
+    })
+    public ResponseEntity<AccountGetDto> createAccount(@Valid @RequestBody AccountCreateDto account) {
+        Account newAccount = accountService.createAccount(account);
         return accountService
-                .getAccountById(account.getId())
+                .getAccountById(newAccount.getId())
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping
-    public List<AccountDto> getAccounts(
-            @RequestParam(required = false) Integer userId,
-            @RequestParam(required = false) Integer categoryId,
-            @RequestParam(required = false) Float limit) {
+    @Operation(summary = "Get all accounts", description = "Retrieves a list of all accounts")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Accounts retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid parameters")
+    })
+    public List<AccountGetDto> getAccounts() {
         return accountService.getAllAccounts();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AccountDto> getAccount(@PathVariable int id) {
+    @Operation(summary = "Get account by ID", description = "Retrieves an account by its ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Account found"),
+            @ApiResponse(responseCode = "404", description = "Account not found")
+    })
+    public ResponseEntity<AccountGetDto> getAccount(
+            @Parameter(description = "ID of the account to retrieve", example = "1")
+            @PathVariable int id) {
         return accountService
                 .getAccountById(id)
                 .map(ResponseEntity::ok)
@@ -53,20 +76,44 @@ public class AccountController {
     }
 
     @GetMapping("/filter")
-    public List<AccountDto> getAccountsByClient(@RequestParam int clientId) {
-        return  accountService.findByClientId(clientId);
+    @Operation(summary = "Get accounts by client ID",
+            description = "Retrieves accounts associated with a specific client ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Accounts retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid client ID")
+    })
+    public List<AccountGetDto> getAccountsByClient(
+            @Parameter(description = "Client ID to filter accounts", example = "1")
+            @RequestParam int clientId) {
+        return accountService.findByClientId(clientId);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AccountDto> updateAccount(@PathVariable int id,
-                                                    @RequestBody Account accountDetails) {
-        AccountDto updatedAccount = accountService.updateAccount(id, accountDetails);
+    @Operation(summary = "Update account by ID", description = "Updates an existing account with the provided details")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Account updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Account not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid input")
+    })
+    public ResponseEntity<AccountGetDto> updateAccount(
+            @Parameter(description = "ID of the account to update", example = "1")
+            @PathVariable int id,
+
+            @Parameter(description = "Updated account details")
+            @RequestBody Account accountDetails) {
+        AccountGetDto updatedAccount = accountService.updateAccount(id, accountDetails);
         return ResponseEntity.ok(updatedAccount);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteAccount(@PathVariable int id) {
-
+    @Operation(summary = "Delete account by ID", description = "Deletes an account by its ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Account deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Account not found")
+    })
+    public void deleteAccount(
+            @Parameter(description = "ID of the account to delete", example = "1")
+            @PathVariable int id) {
         accountService.deleteAccount(id);
     }
 

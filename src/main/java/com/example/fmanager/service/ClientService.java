@@ -2,15 +2,20 @@ package com.example.fmanager.service;
 
 import static com.example.fmanager.exception.NotFoundMessages.CLIENT_NOT_FOUND_MESSAGE;
 
-import com.example.fmanager.dto.ClientDto;
-import com.example.fmanager.exception.ExceptionNotFound;
+import com.example.fmanager.dto.ClientCreateDto;
+import com.example.fmanager.dto.ClientGetDto;
+import com.example.fmanager.exception.InvalidDataException;
+import com.example.fmanager.exception.NotFoundException;
 import com.example.fmanager.models.Client;
 import com.example.fmanager.repository.ClientRepository;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 @Service
 public class ClientService {
@@ -20,41 +25,47 @@ public class ClientService {
         this.clientRepository = userRepository;
     }
 
-    public List<ClientDto> findAll() {
+    public List<ClientGetDto> findAll() {
         List<Client> clients = clientRepository.findAll();
-        List<ClientDto> clientDtos = new ArrayList<>();
+        List<ClientGetDto> clientDtos = new ArrayList<>();
         for (Client client : clients) {
-            clientDtos.add(ClientDto.convertToDto(client));
+            clientDtos.add(ClientGetDto.convertToDto(client));
         }
         return clientDtos;
     }
 
-    public Optional<ClientDto> findById(int id) {
+    public Optional<ClientGetDto> findById(int id) {
         Client client = clientRepository.findById(id)
-                .orElseThrow(() -> new ExceptionNotFound(CLIENT_NOT_FOUND_MESSAGE));
-        return Optional.of(ClientDto.convertToDto(client));
+                .orElseThrow(() -> new NotFoundException(CLIENT_NOT_FOUND_MESSAGE));
+        return Optional.of(ClientGetDto.convertToDto(client));
     }
 
-    public Client createUser(Client user) {
-        return clientRepository.save(user);
+    public Client createUser(ClientCreateDto userCreateDto) {
+        Client client = new Client();
+        client.setUsername(userCreateDto.getUsername());
+        client.setPassword(userCreateDto.getPassword());
+        client.setEmail(userCreateDto.getEmail());
+        return clientRepository.save(client);
+
+
     }
 
     @Transactional
-    public ClientDto updateUser(int id, Client userDetails) {
+    public ClientGetDto updateUser(int id, Client userDetails) {
         Client user = clientRepository.findById(id)
-                .orElseThrow(() -> new ExceptionNotFound(CLIENT_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new NotFoundException(CLIENT_NOT_FOUND_MESSAGE));
         user.setUsername(userDetails.getUsername());
         user.setPassword(userDetails.getPassword());
         user.setEmail(userDetails.getEmail());
         user.setBudgets(userDetails.getBudgets());
         user.setAccounts(userDetails.getAccounts());
-        return ClientDto.convertToDto(clientRepository.save(user));
+        return ClientGetDto.convertToDto(clientRepository.save(user));
     }
 
     @Transactional
     public void deleteUser(int id) {
         Client user = clientRepository.findById(id)
-                .orElseThrow(() -> new ExceptionNotFound(CLIENT_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new NotFoundException(CLIENT_NOT_FOUND_MESSAGE));
         clientRepository.delete(user);
     }
 }

@@ -2,61 +2,71 @@ package com.example.fmanager.service;
 
 import static com.example.fmanager.exception.NotFoundMessages.ACCOUNT_NOT_FOUND_MESSAGE;
 
-import com.example.fmanager.dto.AccountDto;
-import com.example.fmanager.exception.ExceptionNotFound;
+import com.example.fmanager.dto.AccountCreateDto;
+import com.example.fmanager.dto.AccountGetDto;
+import com.example.fmanager.exception.NotFoundException;
 import com.example.fmanager.models.Account;
+import com.example.fmanager.models.Client;
 import com.example.fmanager.repository.AccountRepository;
 import com.example.fmanager.repository.CategoryRepository;
+import com.example.fmanager.repository.ClientRepository;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.postgresql.util.PSQLException;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 @Service
 public class AccountService {
     private final AccountRepository accountRepository;
     private final CategoryRepository categoryRepository;
+    private final ClientRepository clientRepository;
     private final TransactionService transactionService;
     private final InMemoryCache cache;
 
     public AccountService(AccountRepository accountRepository,
                           InMemoryCache cache,
                           CategoryRepository categoryRepository,
-                          TransactionService transactionService) {
+                          TransactionService transactionService,
+                          ClientRepository clientRepository) {
         this.accountRepository = accountRepository;
         this.categoryRepository = categoryRepository;
+        this.clientRepository = clientRepository;
         this.transactionService = transactionService;
         this.cache = cache;
     }
 
-    public Optional<AccountDto> getAccountById(int id) {
+    public Optional<AccountGetDto> getAccountById(int id) {
         Account account = accountRepository.findById(id)
-                .orElseThrow(() -> new ExceptionNotFound(ACCOUNT_NOT_FOUND_MESSAGE));
-        return Optional.of(AccountDto.convertToDto(account));
+                .orElseThrow(() -> new NotFoundException(ACCOUNT_NOT_FOUND_MESSAGE));
+        return Optional.of(AccountGetDto.convertToDto(account));
     }
 
-    public List<AccountDto> getAllAccounts() {
+    public List<AccountGetDto> getAllAccounts() {
         List<Account> accounts = accountRepository.findAll();
-        List<AccountDto> accountDtos = new ArrayList<>();
+        List<AccountGetDto> accountGetDtos = new ArrayList<>();
         for (Account account : accounts) {
-            accountDtos.add(AccountDto.convertToDto(account));
+            accountGetDtos.add(AccountGetDto.convertToDto(account));
         }
-        return accountDtos;
+        return accountGetDtos;
     }
 
-    public List<AccountDto> findByClientId(int clientId) {
+    public List<AccountGetDto> findByClientId(int clientId) {
         String cacheKey = "accounts_client_" + clientId;
         if (cache.containsKey(cacheKey)) {
-            return (List<AccountDto>) cache.get(cacheKey);
+            return (List<AccountGetDto>) cache.get(cacheKey);
         }
         List<Account> accounts = accountRepository.findAllByClientId(clientId);
-        List<AccountDto> accountDtos = new ArrayList<>();
+        List<AccountGetDto> accountGetDtos = new ArrayList<>();
         for (Account account : accounts) {
-            accountDtos.add(AccountDto.convertToDto(account));
+            accountGetDtos.add(AccountGetDto.convertToDto(account));
         }
-        cache.put(cacheKey, accountDtos);
-        return accountDtos;
+        cache.put(cacheKey, accountGetDtos);
+        return accountGetDtos;
     }
 
     public void clearCacheForClient(int clientId) {
@@ -64,35 +74,49 @@ public class AccountService {
         cache.remove(cacheKey);
     }
 
-    public Account createAccount(Account account) {
-        Account savedAccount = accountRepository.save(account);
-        List<Integer> categoryIds = categoryRepository.findCategoryIdsByClientId(
-                savedAccount.getClient().getId()
-        );
-        for (Integer categoryId : categoryIds) {
-            transactionService.clearCacheForClientAndCategory(
-                    savedAccount.getClient().getId(), categoryId
+    public Account createAccount(AccountCreateDto accountCreateDto) {
+        try {
+
+
+            Client client = clientRepository.findById(accountCreateDto.getClientId())
+                    .orElseThrow(() -> new RuntimeException("Client not found"));
+            Account account = new Account();
+            account.setName(accountCreateDto.getName());
+            account.setBalance(accountCreateDto.getBalance());
+            account.setClient(client);
+            Account savedAccount = accountRepository.save(account);
+            List<Integer> categoryIds = categoryRepository.findCategoryIdsByClientId(
+                    savedAccount.getClient().getId()
             );
+            for (Integer categoryId : categoryIds) {
+                transactionService.clearCacheForClientAndCategory(
+                        savedAccount.getClient().getId(), categoryId
+                );
+            }
+            clearCacheForClient(savedAccount.getClient().getId());
+            return savedAccount;
         }
-        clearCacheForClient(savedAccount.getClient().getId());
-        return savedAccount;
+        catch (DataIntegrityViolationException e) {
+            System.out.println("ERROROR");
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Your error message here");
+        }
     }
 
     @Transactional
-    public AccountDto updateAccount(int id, Account accountDetails) {
+    public AccountGetDto updateAccount(int id, Account accountDetails) {
         Account account = accountRepository.findById(id)
-                .orElseThrow(() -> new ExceptionNotFound(ACCOUNT_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new NotFoundException(ACCOUNT_NOT_FOUND_MESSAGE));
         account.setName(accountDetails.getName());
         account.setBalance(accountDetails.getBalance());
         Account savedAccount = accountRepository.save(account);
         clearCacheForClient(savedAccount.getClient().getId());
-        return AccountDto.convertToDto(savedAccount);
+        return AccountGetDto.convertToDto(savedAccount);
     }
 
     @Transactional
     public void deleteAccount(int id) {
         Account account = accountRepository.findById(id)
-                .orElseThrow(() -> new ExceptionNotFound(ACCOUNT_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new NotFoundException(ACCOUNT_NOT_FOUND_MESSAGE));
         clearCacheForClient(account.getClient().getId());
         accountRepository.delete(account);
     }

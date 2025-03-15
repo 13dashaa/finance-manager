@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class TransactionDto {
+public class TransactionGetDto {
     private int id;
     private String description;
     private Float amount;
@@ -16,8 +16,8 @@ public class TransactionDto {
     private LocalDateTime date;
     private LocalDateTime createdAt;
 
-    public static TransactionDto convertToDto(Transaction transaction) {
-        TransactionDto dto = new TransactionDto();
+    public static TransactionGetDto convertToDto(Transaction transaction) {
+        TransactionGetDto dto = new TransactionGetDto();
         dto.setId(transaction.getId());
         dto.setCategoryId(transaction.getCategory().getId());
         dto.setAccountId(transaction.getAccount().getId());

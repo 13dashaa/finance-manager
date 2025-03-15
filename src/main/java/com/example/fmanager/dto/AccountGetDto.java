@@ -11,7 +11,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AccountDto {
+public class AccountGetDto {
 
     private int id;
     private String name;
@@ -21,8 +21,8 @@ public class AccountDto {
     private int clientId;
     private Set<Integer> transactionIds;
 
-    public static AccountDto convertToDto(Account account) {
-        AccountDto dto = new AccountDto();
+    public static AccountGetDto convertToDto(Account account) {
+        AccountGetDto dto = new AccountGetDto();
         dto.setId(account.getId());
         Set<Transaction> transactions = account.getTransactions();
         if (transactions != null) {

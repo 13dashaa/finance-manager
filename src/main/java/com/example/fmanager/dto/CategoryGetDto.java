@@ -11,14 +11,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CategoryDto {
+public class CategoryGetDto {
     private int id;
     private String name;
     private Set<Integer> budgetIds;
     private Set<Integer> transactionIds;
 
-    public static CategoryDto convertToDto(Category category) {
-        CategoryDto dto = new CategoryDto();
+    public static CategoryGetDto convertToDto(Category category) {
+        CategoryGetDto dto = new CategoryGetDto();
         dto.setId(category.getId());
         Set<Budget> budgets = category.getBudgets();
         if (budgets != null) {

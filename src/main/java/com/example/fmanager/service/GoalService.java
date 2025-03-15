@@ -1,10 +1,14 @@
 package com.example.fmanager.service;
 
+import static com.example.fmanager.exception.NotFoundMessages.CLIENT_NOT_FOUND_MESSAGE;
 import static com.example.fmanager.exception.NotFoundMessages.GOAL_NOT_FOUND_MESSAGE;
 
-import com.example.fmanager.dto.GoalDto;
-import com.example.fmanager.exception.ExceptionNotFound;
+import com.example.fmanager.dto.GoalCreateDto;
+import com.example.fmanager.dto.GoalGetDto;
+import com.example.fmanager.exception.NotFoundException;
+import com.example.fmanager.models.Client;
 import com.example.fmanager.models.Goal;
+import com.example.fmanager.repository.ClientRepository;
 import com.example.fmanager.repository.GoalRepository;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
@@ -16,36 +20,40 @@ import org.springframework.stereotype.Service;
 public class GoalService {
     private final GoalRepository goalRepository;
     private final InMemoryCache cache;
+    private final ClientRepository clientRepository;
 
-    public GoalService(GoalRepository goalRepository, InMemoryCache cache) {
+    public GoalService(GoalRepository goalRepository,
+                       InMemoryCache cache,
+                       ClientRepository clientRepository) {
         this.goalRepository = goalRepository;
         this.cache = cache;
+        this.clientRepository = clientRepository;
     }
 
-    public Optional<GoalDto> getGoalById(int id) {
+    public Optional<GoalGetDto> getGoalById(int id) {
         Goal goal = goalRepository.findById(id)
-                .orElseThrow(() -> new ExceptionNotFound(GOAL_NOT_FOUND_MESSAGE));
-        return Optional.of(GoalDto.convertToDto(goal));
+                .orElseThrow(() -> new NotFoundException(GOAL_NOT_FOUND_MESSAGE));
+        return Optional.of(GoalGetDto.convertToDto(goal));
     }
 
-    public List<GoalDto> getAllGoals() {
+    public List<GoalGetDto> getAllGoals() {
         List<Goal> goals = goalRepository.findAll();
-        List<GoalDto> goalsDtos = new ArrayList<>();
+        List<GoalGetDto> goalsDtos = new ArrayList<>();
         for (Goal goal : goals) {
-            goalsDtos.add(GoalDto.convertToDto(goal));
+            goalsDtos.add(GoalGetDto.convertToDto(goal));
         }
         return goalsDtos;
     }
 
-    public List<GoalDto> findByClientId(int clientId) {
+    public List<GoalGetDto> findByClientId(int clientId) {
         String cacheKey = "goals_client_" + clientId;
         if (cache.containsKey(cacheKey)) {
-            return (List<GoalDto>) cache.get(cacheKey);
+            return (List<GoalGetDto>) cache.get(cacheKey);
         }
         List<Goal> goals = goalRepository.findByClientId(clientId);
-        List<GoalDto> goalsDtos = new ArrayList<>();
+        List<GoalGetDto> goalsDtos = new ArrayList<>();
         for (Goal goal : goals) {
-            goalsDtos.add(GoalDto.convertToDto(goal));
+            goalsDtos.add(GoalGetDto.convertToDto(goal));
         }
         cache.put(cacheKey, goalsDtos);
         return goalsDtos;
@@ -56,16 +64,24 @@ public class GoalService {
         cache.remove(cacheKey);
     }
 
-    public Goal createGoal(Goal goal) {
+    public Goal createGoal(GoalCreateDto goalCreateDto) {
+        Client client = clientRepository.findById(goalCreateDto.getClientId())
+                .orElseThrow(() -> new RuntimeException(CLIENT_NOT_FOUND_MESSAGE));
+        Goal goal = new Goal();
+        goal.setName(goalCreateDto.getName());
+        goal.setStartDate(goalCreateDto.getStartDate());
+        goal.setEndDate(goalCreateDto.getEndDate());
+        goal.setTargetAmount(goalCreateDto.getTargetAmount());
+        goal.setClient(client);
         Goal savedGoal = goalRepository.save(goal);
         clearCacheForClient(savedGoal.getClient().getId());
         return savedGoal;
     }
 
     @Transactional
-    public GoalDto updateGoal(int id, Goal goalDetails) {
+    public GoalGetDto updateGoal(int id, Goal goalDetails) {
         Goal goal = goalRepository.findById(id)
-                .orElseThrow(() -> new ExceptionNotFound(GOAL_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new NotFoundException(GOAL_NOT_FOUND_MESSAGE));
         if (goal.getClient().getId() != goalDetails.getClient().getId()) {
             clearCacheForClient(goal.getClient().getId());
         }
@@ -77,13 +93,13 @@ public class GoalService {
         goal.setStartDate(goalDetails.getStartDate());
         Goal savedGoal = goalRepository.save(goal);
         clearCacheForClient(savedGoal.getClient().getId());
-        return GoalDto.convertToDto(savedGoal);
+        return GoalGetDto.convertToDto(savedGoal);
     }
 
     @Transactional
     public void deleteGoal(int id) {
         Goal goal = goalRepository.findById(id)
-                .orElseThrow(() -> new ExceptionNotFound(GOAL_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new NotFoundException(GOAL_NOT_FOUND_MESSAGE));
         clearCacheForClient(goal.getClient().getId());
         goalRepository.delete(goal);
     }
