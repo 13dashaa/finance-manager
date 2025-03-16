@@ -76,7 +76,8 @@ public class TransactionService {
         transaction.setAmount(transactionCreateDto.getAmount());
         transaction.setDate(transactionCreateDto.getDate());
         transaction.setDescription(transactionCreateDto.getDescription());
-        Account transactionalAccount = accountRepository.findById(transactionCreateDto.getAccountId())
+        Account transactionalAccount = accountRepository
+                .findById(transactionCreateDto.getAccountId())
                 .orElseThrow(() -> new RuntimeException(ACCOUNT_NOT_FOUND_MESSAGE));
         transaction.setAccount(transactionalAccount);
         Category category = categoryRepository.findById(transactionCreateDto.getCategoryId())

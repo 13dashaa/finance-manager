@@ -51,17 +51,14 @@ public class BudgetService {
     }
 
     public Budget createBudget(BudgetCreateDto budgetCreateDto) {
-        Category category = categoryRepository.findById(budgetCreateDto.getCategoryId())
-                .orElseThrow(() -> new RuntimeException(CATEGORY_NOT_FOUND_MESSAGE));
-
-        // Получаем клиентов по их ID
         Set<Client> clients = new HashSet<>();
         for (Integer clientId : budgetCreateDto.getClientIds()) {
             Client client = clientRepository.findById(clientId)
                     .orElseThrow(() -> new RuntimeException(CLIENT_NOT_FOUND_MESSAGE + clientId));
             clients.add(client);
         }
-
+        Category category = categoryRepository.findById(budgetCreateDto.getCategoryId())
+                .orElseThrow(() -> new RuntimeException(CATEGORY_NOT_FOUND_MESSAGE));
         Budget budget = new Budget();
         budget.setPeriod(budgetCreateDto.getPeriod());
         budget.setLimitation(budgetCreateDto.getLimitation());

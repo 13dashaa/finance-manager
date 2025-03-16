@@ -4,11 +4,15 @@ import com.example.fmanager.dto.CategoryCreateDto;
 import com.example.fmanager.dto.CategoryGetDto;
 import com.example.fmanager.models.Category;
 import com.example.fmanager.service.CategoryService;
-import java.util.List;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/categories")
+@Tag(name = "Category Management", description = "APIs for managing categories")
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -28,7 +33,16 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<CategoryGetDto> createCategory(@Valid @RequestBody CategoryCreateDto categoryCreateDto) {
+    @Operation(summary = "Create a new category",
+               description = "Creates a new category with the provided details")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Category created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input"),
+        @ApiResponse(responseCode = "404", description = "Category not found after creation")
+    })
+    public ResponseEntity<CategoryGetDto> createCategory(
+            @Valid @RequestBody CategoryCreateDto categoryCreateDto
+    ) {
         Category category = categoryService.createCategory(categoryCreateDto);
         return categoryService
                 .findById(category.getId())
@@ -37,12 +51,24 @@ public class CategoryController {
     }
 
     @GetMapping
+    @Operation(summary = "Get all categories", description = "Retrieves a list of all categories")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Categories retrieved successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid request")
+    })
     public List<CategoryGetDto> getCategories() {
         return categoryService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryGetDto> getCategoryById(@PathVariable int id) {
+    @Operation(summary = "Get category by ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Category found"),
+        @ApiResponse(responseCode = "404", description = "Category not found")
+    })
+    public ResponseEntity<CategoryGetDto> getCategoryById(
+            @Parameter(description = "ID of the category to retrieve", example = "1")
+            @PathVariable int id) {
         return categoryService
                 .findById(id)
                 .map(ResponseEntity::ok)
@@ -50,19 +76,30 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteCategory(@PathVariable int id) {
+    @Operation(summary = "Delete category by ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Category deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "Category not found")
+    })
+    public void deleteCategory(
+            @Parameter(description = "ID of the category to delete", example = "1")
+            @PathVariable int id) {
         categoryService.deleteCategory(id);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryGetDto> updateCategory(@PathVariable int id,
-                                                         @RequestBody Category categoryDetails) {
+    @Operation(summary = "Update category by ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Category updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input"),
+        @ApiResponse(responseCode = "404", description = "Category not found")
+    })
+    public ResponseEntity<CategoryGetDto> updateCategory(
+            @Parameter(description = "ID of the category to update", example = "1")
+            @PathVariable int id,
+            @Parameter(description = "Updated category details")
+            @RequestBody Category categoryDetails) {
         CategoryGetDto updatedCategory = categoryService.updateCategory(id, categoryDetails);
         return ResponseEntity.ok(updatedCategory);
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
     }
 }

@@ -4,7 +4,6 @@ import static com.example.fmanager.exception.NotFoundMessages.CLIENT_NOT_FOUND_M
 
 import com.example.fmanager.dto.ClientCreateDto;
 import com.example.fmanager.dto.ClientGetDto;
-import com.example.fmanager.exception.InvalidDataException;
 import com.example.fmanager.exception.NotFoundException;
 import com.example.fmanager.models.Client;
 import com.example.fmanager.repository.ClientRepository;
@@ -12,10 +11,7 @@ import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
 @Service
 public class ClientService {

@@ -14,11 +14,7 @@ import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.postgresql.util.PSQLException;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
 @Service
 public class AccountService {
@@ -75,31 +71,23 @@ public class AccountService {
     }
 
     public Account createAccount(AccountCreateDto accountCreateDto) {
-        try {
-
-
-            Client client = clientRepository.findById(accountCreateDto.getClientId())
-                    .orElseThrow(() -> new RuntimeException("Client not found"));
-            Account account = new Account();
-            account.setName(accountCreateDto.getName());
-            account.setBalance(accountCreateDto.getBalance());
-            account.setClient(client);
-            Account savedAccount = accountRepository.save(account);
-            List<Integer> categoryIds = categoryRepository.findCategoryIdsByClientId(
-                    savedAccount.getClient().getId()
+        Client client = clientRepository.findById(accountCreateDto.getClientId())
+                .orElseThrow(() -> new RuntimeException("Client not found"));
+        Account account = new Account();
+        account.setName(accountCreateDto.getName());
+        account.setBalance(accountCreateDto.getBalance());
+        account.setClient(client);
+        Account savedAccount = accountRepository.save(account);
+        List<Integer> categoryIds = categoryRepository.findCategoryIdsByClientId(
+                savedAccount.getClient().getId()
+        );
+        for (Integer categoryId : categoryIds) {
+            transactionService.clearCacheForClientAndCategory(
+                    savedAccount.getClient().getId(), categoryId
             );
-            for (Integer categoryId : categoryIds) {
-                transactionService.clearCacheForClientAndCategory(
-                        savedAccount.getClient().getId(), categoryId
-                );
-            }
-            clearCacheForClient(savedAccount.getClient().getId());
-            return savedAccount;
         }
-        catch (DataIntegrityViolationException e) {
-            System.out.println("ERROROR");
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Your error message here");
-        }
+        clearCacheForClient(savedAccount.getClient().getId());
+        return savedAccount;
     }
 
     @Transactional

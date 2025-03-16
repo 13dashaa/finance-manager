@@ -1,18 +1,15 @@
 package com.example.fmanager.dto;
 
-import java.time.LocalDateTime;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.PastOrPresent;
-
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 @Getter
 public class TransactionCreateDto {
-
     private String description;
     @NotNull(message = "Amount can not be null")
     private Float amount;

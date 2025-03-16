@@ -7,6 +7,7 @@ public class NotFoundMessages {
     public static final String CLIENT_NOT_FOUND_MESSAGE = "Client not found";
     public static final String GOAL_NOT_FOUND_MESSAGE = "Goal not found";
     public static final String TRANSACTION_NOT_FOUND_MESSAGE = "Transaction not found";
+    public static final String BAD_REQUEST = "Bad Request";
 
     private NotFoundMessages() {
         throw new UnsupportedOperationException("Class cannot be instantiated");
