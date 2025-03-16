@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.NoSuchElementException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -41,9 +42,10 @@ public class LogController {
         @ApiResponse(responseCode = "500", description = "Server error processing request")
     })
     @GetMapping("/{date}")
-    public ResponseEntity<Resource> getLogsByDate(@PathVariable String date) {
+    public ResponseEntity<Resource> getLogsByDate(@PathVariable LocalDate date) {
         try {
-            String logFilePath = logService.generateLogFileForDate(date);
+            String dateString = date.toString();
+            String logFilePath = logService.generateLogFileForDate(dateString);
             Path filePath = Paths.get(logFilePath);
             Resource resource = new UrlResource(filePath.toUri());
             return ResponseEntity.ok()
