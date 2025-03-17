@@ -92,14 +92,12 @@ public class TransactionService {
     }
 
     @Transactional
-    public TransactionGetDto updateTransaction(int id, Transaction transactionDetails) {
+    public TransactionGetDto updateTransaction(int id, TransactionCreateDto transactionDetails) {
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(TRANSACTION_NOT_FOUND_MESSAGE));
         transaction.setDescription(transactionDetails.getDescription());
         transaction.setAmount(transactionDetails.getAmount());
         transaction.setDate(transactionDetails.getDate());
-        transaction.setAccount(transactionDetails.getAccount());
-        transaction.setCategory(transactionDetails.getCategory());
         Transaction savedTransaction = transactionRepository.save(transaction);
         Account account = accountRepository.findById(transaction.getAccount().getId())
                 .orElseThrow(() -> new IllegalArgumentException(ACCOUNT_NOT_FOUND_MESSAGE));

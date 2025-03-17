@@ -2,6 +2,7 @@ package com.example.fmanager.controller;
 
 import com.example.fmanager.dto.AccountCreateDto;
 import com.example.fmanager.dto.AccountGetDto;
+import com.example.fmanager.dto.AccountUpdateDto;
 import com.example.fmanager.models.Account;
 import com.example.fmanager.service.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -100,7 +101,7 @@ public class AccountController {
             @Parameter(description = "ID of the account to update", example = "1")
             @PathVariable int id,
             @Parameter(description = "Updated account details")
-            @RequestBody Account accountDetails) {
+            @RequestBody AccountUpdateDto accountDetails) {
         AccountGetDto updatedAccount = accountService.updateAccount(id, accountDetails);
         return ResponseEntity.ok(updatedAccount);
     }

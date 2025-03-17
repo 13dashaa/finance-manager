@@ -4,6 +4,7 @@ import static com.example.fmanager.exception.NotFoundMessages.CLIENT_NOT_FOUND_M
 
 import com.example.fmanager.dto.ClientCreateDto;
 import com.example.fmanager.dto.ClientGetDto;
+import com.example.fmanager.dto.ClientUpdateDto;
 import com.example.fmanager.exception.NotFoundException;
 import com.example.fmanager.models.Client;
 import com.example.fmanager.repository.ClientRepository;
@@ -47,14 +48,10 @@ public class ClientService {
     }
 
     @Transactional
-    public ClientGetDto updateUser(int id, Client userDetails) {
+    public ClientGetDto updateUser(int id, ClientUpdateDto userDetails) {
         Client user = clientRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(CLIENT_NOT_FOUND_MESSAGE));
         user.setUsername(userDetails.getUsername());
-        user.setPassword(userDetails.getPassword());
-        user.setEmail(userDetails.getEmail());
-        user.setBudgets(userDetails.getBudgets());
-        user.setAccounts(userDetails.getAccounts());
         return ClientGetDto.convertToDto(clientRepository.save(user));
     }
 

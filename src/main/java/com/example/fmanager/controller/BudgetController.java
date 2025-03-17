@@ -2,6 +2,7 @@ package com.example.fmanager.controller;
 
 import com.example.fmanager.dto.BudgetCreateDto;
 import com.example.fmanager.dto.BudgetGetDto;
+import com.example.fmanager.dto.BudgetUpdateDto;
 import com.example.fmanager.models.Budget;
 import com.example.fmanager.service.BudgetService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -96,7 +97,7 @@ public class BudgetController {
             @Parameter(description = "ID of the budget to update", example = "1")
             @PathVariable int id,
             @Parameter(description = "Updated budget details")
-            @RequestBody Budget budgetDetails) {
+            @RequestBody BudgetUpdateDto budgetDetails) {
         BudgetGetDto updatedBudget = budgetService.updateBudget(id, budgetDetails);
         return ResponseEntity.ok(updatedBudget);
     }
