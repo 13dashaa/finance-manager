@@ -110,7 +110,7 @@ public class GoalController {
             @Parameter(description = "ID of the goal to update", example = "1")
             @PathVariable int id,
             @Parameter(description = "Updated goal details")
-            @RequestBody Goal goalDetails) {
+            @RequestBody GoalCreateDto goalDetails) {
         GoalGetDto updatedGoal = goalService.updateGoal(id, goalDetails);
         return ResponseEntity.ok(updatedGoal);
     }

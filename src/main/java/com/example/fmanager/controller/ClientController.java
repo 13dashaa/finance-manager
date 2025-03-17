@@ -3,6 +3,7 @@ package com.example.fmanager.controller;
 import com.example.fmanager.dto.BulkCreateDto;
 import com.example.fmanager.dto.ClientCreateDto;
 import com.example.fmanager.dto.ClientGetDto;
+import com.example.fmanager.dto.ClientUpdateDto;
 import com.example.fmanager.models.Client;
 import com.example.fmanager.service.ClientService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -122,7 +123,7 @@ public class ClientController {
             @Parameter(description = "ID of the client to update", example = "1")
             @PathVariable int id,
             @Parameter(description = "Updated client details")
-            @RequestBody Client clientDetails) {
+            @RequestBody ClientUpdateDto clientDetails) {
         ClientGetDto updatedClient = clientService.updateUser(id, clientDetails);
         return ResponseEntity.ok(updatedClient);
     }

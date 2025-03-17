@@ -52,12 +52,10 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryGetDto updateCategory(int id, Category categoryDetails) {
+    public CategoryGetDto updateCategory(int id, CategoryCreateDto categoryDetails) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(CATEGORY_NOT_FOUND_MESSAGE));
         category.setName(categoryDetails.getName());
-        category.setBudgets(categoryDetails.getBudgets());
-        category.setTransactions(categoryDetails.getTransactions());
         Category savedCategory = categoryRepository.save(category);
         clearCategoryCache();
         return CategoryGetDto.convertToDto(savedCategory);

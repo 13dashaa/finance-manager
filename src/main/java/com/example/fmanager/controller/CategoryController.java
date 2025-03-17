@@ -98,7 +98,7 @@ public class CategoryController {
             @Parameter(description = "ID of the category to update", example = "1")
             @PathVariable int id,
             @Parameter(description = "Updated category details")
-            @RequestBody Category categoryDetails) {
+            @RequestBody CategoryCreateDto categoryDetails) {
         CategoryGetDto updatedCategory = categoryService.updateCategory(id, categoryDetails);
         return ResponseEntity.ok(updatedCategory);
     }

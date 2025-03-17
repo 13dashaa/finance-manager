@@ -4,6 +4,7 @@ import static com.example.fmanager.exception.NotFoundMessages.ACCOUNT_NOT_FOUND_
 
 import com.example.fmanager.dto.AccountCreateDto;
 import com.example.fmanager.dto.AccountGetDto;
+import com.example.fmanager.dto.AccountUpdateDto;
 import com.example.fmanager.exception.NotFoundException;
 import com.example.fmanager.models.Account;
 import com.example.fmanager.models.Client;
@@ -91,7 +92,7 @@ public class AccountService {
     }
 
     @Transactional
-    public AccountGetDto updateAccount(int id, Account accountDetails) {
+    public AccountGetDto updateAccount(int id, AccountUpdateDto accountDetails) {
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ACCOUNT_NOT_FOUND_MESSAGE));
         account.setName(accountDetails.getName());

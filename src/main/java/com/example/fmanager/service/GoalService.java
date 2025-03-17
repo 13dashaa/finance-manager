@@ -79,16 +79,11 @@ public class GoalService {
     }
 
     @Transactional
-    public GoalGetDto updateGoal(int id, Goal goalDetails) {
+    public GoalGetDto updateGoal(int id, GoalCreateDto goalDetails) {
         Goal goal = goalRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(GOAL_NOT_FOUND_MESSAGE));
-        if (goal.getClient().getId() != goalDetails.getClient().getId()) {
-            clearCacheForClient(goal.getClient().getId());
-        }
         goal.setName(goalDetails.getName());
         goal.setTargetAmount(goalDetails.getTargetAmount());
-        goal.setCurrentAmount(goalDetails.getCurrentAmount());
-        goal.setClient(goalDetails.getClient());
         goal.setEndDate(goalDetails.getEndDate());
         goal.setStartDate(goalDetails.getStartDate());
         Goal savedGoal = goalRepository.save(goal);

@@ -6,6 +6,7 @@ import static com.example.fmanager.exception.NotFoundMessages.CLIENT_NOT_FOUND_M
 
 import com.example.fmanager.dto.BudgetCreateDto;
 import com.example.fmanager.dto.BudgetGetDto;
+import com.example.fmanager.dto.BudgetUpdateDto;
 import com.example.fmanager.exception.NotFoundException;
 import com.example.fmanager.models.Budget;
 import com.example.fmanager.models.Category;
@@ -68,13 +69,18 @@ public class BudgetService {
     }
 
     @Transactional
-    public BudgetGetDto updateBudget(int id, Budget budgetDetails) {
+    public BudgetGetDto updateBudget(int id, BudgetUpdateDto budgetDetails) {
         Budget budget = budgetRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(BUDGET_NOT_FOUND_MESSAGE));
         budget.setPeriod(budgetDetails.getPeriod());
         budget.setLimitation(budgetDetails.getLimitation());
-        budget.setClients(budgetDetails.getClients());
-        budget.setCategory(budgetDetails.getCategory());
+        Set<Client> clients = new HashSet<>();
+        for (Integer clientId : budgetDetails.getClientIds()) {
+            Client client = clientRepository.findById(clientId)
+                    .orElseThrow(() -> new RuntimeException(CLIENT_NOT_FOUND_MESSAGE + clientId));
+            clients.add(client);
+        }
+        budget.setClients(clients);
         return BudgetGetDto.convertToDto(budgetRepository.save(budget));
     }
 

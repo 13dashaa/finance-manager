@@ -102,7 +102,7 @@ public class TransactionController {
             @Parameter(description = "ID of the transaction to update", example = "1")
             @PathVariable int id,
             @Parameter(description = "Updated transaction details")
-            @RequestBody Transaction transactionDetails) {
+            @RequestBody TransactionCreateDto transactionDetails) {
         TransactionGetDto updatedTransaction =
                 transactionService.updateTransaction(id, transactionDetails);
         return ResponseEntity.ok(updatedTransaction);
