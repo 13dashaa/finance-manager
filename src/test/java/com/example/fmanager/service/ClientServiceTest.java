@@ -36,7 +36,7 @@ public class ClientServiceTest {
 
     @Test
     void testFindAll() {
-        // Подготовка данных
+
         Client client1 = new Client();
         client1.setId(1);
         client1.setUsername("user1");
