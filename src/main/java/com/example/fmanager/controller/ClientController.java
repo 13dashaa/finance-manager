@@ -1,5 +1,6 @@
 package com.example.fmanager.controller;
 
+import com.example.fmanager.dto.BulkCreateDto;
 import com.example.fmanager.dto.ClientCreateDto;
 import com.example.fmanager.dto.ClientGetDto;
 import com.example.fmanager.dto.ClientUpdateDto;
@@ -86,6 +87,28 @@ public class ClientController {
             @Parameter(description = "ID of the client to delete", example = "1")
             @PathVariable int id) {
         clientService.deleteUser(id);
+    }
+
+    @PostMapping("/bulk")
+    @Operation(summary = "Create multiple clients",
+            description = "Creates multiple clients with the provided details")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Clients created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input")
+    })
+    public ResponseEntity<List<ClientGetDto>> createClientsBulk(
+            @Valid @RequestBody BulkCreateDto<ClientCreateDto> bulkCreateDto
+    ) {
+        List<ClientGetDto> createdClients = bulkCreateDto.getItems().stream()
+                .map(clientCreateDto -> {
+                    Client client = clientService.createUser(clientCreateDto);
+                    return clientService.findById(client.getId())
+                            .orElseThrow(() ->
+                                    new RuntimeException("Client not found after creation"));
+                })
+                .toList();
+
+        return ResponseEntity.ok(createdClients);
     }
 
     @PutMapping("/{id}")
