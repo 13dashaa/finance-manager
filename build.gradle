@@ -2,21 +2,26 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.2'
     id 'io.spring.dependency-management' version '1.1.7'
+    id "jacoco"
     id "org.sonarqube" version "6.0.1.5171"
-    id 'jacoco'
 }
-
+jacoco {
+    toolVersion = "0.8.11"
+}
+/*
 sonar {
     properties {
-        property "sonar.projectKey", "13dashaa"
-        property "sonar.organization", "dasha makushunskaya"
+        property "sonar.projectKey", "13dashaa_finance-manager"
+        property "sonar.organization", "13dashaa"
         property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.projectName", "Finance Manager"
         property "sonar.projectVersion", version
         property "sonar.sources", "src/main/java"
         property "sonar.tests", "src/test/java"
+        property "sonar.login", "b1c421278cea345691caba9cc57d5722a03f1d84"
     }
 }
+*/
 
 
 group = 'com.example'
@@ -24,7 +29,7 @@ version = '0.0.1-SNAPSHOT'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(23)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
@@ -55,6 +60,13 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
-
-
+jacocoTestReport {
+    classDirectories.setFrom(files("build/classes/java/main")) // Путь к скомпилированным классам
+    sourceDirectories.setFrom(files("src/main/java"))
+    reports {
+        xml.required = true
+        csv.required = false
+    }
+}
