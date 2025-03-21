@@ -2,6 +2,7 @@ package com.example.fmanager.controller;
 
 import com.example.fmanager.dto.AccountCreateDto;
 import com.example.fmanager.dto.AccountGetDto;
+import com.example.fmanager.dto.BulkCreateDto;
 import com.example.fmanager.dto.AccountUpdateDto;
 import com.example.fmanager.models.Account;
 import com.example.fmanager.service.AccountService;
@@ -104,6 +105,28 @@ public class AccountController {
             @RequestBody AccountUpdateDto accountDetails) {
         AccountGetDto updatedAccount = accountService.updateAccount(id, accountDetails);
         return ResponseEntity.ok(updatedAccount);
+    }
+
+    @PostMapping("/bulk")
+    @Operation(summary = "Create multiple accounts",
+            description = "Creates multiple accounts with the provided details")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accounts created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input")
+    })
+    public ResponseEntity<List<AccountGetDto>> createAccountsBulk(
+            @Valid @RequestBody BulkCreateDto<AccountCreateDto> bulkCreateDto
+    ) {
+        List<AccountGetDto> createdAccounts = bulkCreateDto.getItems().stream()
+                .map(accountCreateDto -> {
+                    Account newAccount = accountService.createAccount(accountCreateDto);
+                    return accountService.getAccountById(newAccount.getId())
+                            .orElseThrow(() ->
+                                    new RuntimeException("Account not found after creation"));
+                })
+                .toList();
+
+        return ResponseEntity.ok(createdAccounts);
     }
 
     @DeleteMapping("/{id}")
