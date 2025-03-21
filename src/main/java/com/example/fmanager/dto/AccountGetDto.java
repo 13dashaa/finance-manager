@@ -15,7 +15,7 @@ public class AccountGetDto {
 
     private int id;
     private String name;
-    private Float balance;
+    private double balance;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private int clientId;

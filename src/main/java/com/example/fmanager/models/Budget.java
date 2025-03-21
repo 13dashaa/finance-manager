@@ -10,6 +10,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 import lombok.Getter;
@@ -36,7 +37,7 @@ public class Budget {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
     @Column(nullable = false)
-    private Float limitation;
+    private double limitation;
     @Column
     private int period;
     @CreationTimestamp

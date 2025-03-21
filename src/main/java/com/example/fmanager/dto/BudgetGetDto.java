@@ -2,6 +2,7 @@ package com.example.fmanager.dto;
 
 import com.example.fmanager.models.Budget;
 import com.example.fmanager.models.Client;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,7 +17,7 @@ public class BudgetGetDto {
     private int id;
     private Set<Integer> clientIds;
     private Integer categoryId;
-    private Float limitation;
+    private double limitation;
     private int period;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

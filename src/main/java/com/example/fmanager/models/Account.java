@@ -31,7 +31,7 @@ public class Account {
     @Column
     private String name;
     @Column(nullable = false)
-    private Float balance;
+    private double balance;
     @CreationTimestamp
     private LocalDateTime createdAt;
     @UpdateTimestamp

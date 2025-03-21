@@ -25,7 +25,7 @@ public class Transaction {
     @Column
     private String description;
     @Column(nullable = false)
-    private Float amount;
+    private double amount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)

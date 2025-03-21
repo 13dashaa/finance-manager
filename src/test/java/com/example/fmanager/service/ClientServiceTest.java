@@ -28,40 +28,47 @@ class ClientServiceTest {
     @InjectMocks
     private ClientService clientService;
 
-    private Client client;
+    private Client client1;
+    private Client client2;
 
     @BeforeEach
     void setUp() {
-        client = new Client();
-        client.setId(1);
-        client.setUsername("testuser");
-        client.setPassword("password");
-        client.setEmail("test@example.com");
+        client1 = new Client();
+        client1.setId(1);
+        client1.setUsername("testuser1");
+        client1.setPassword("password1");
+        client1.setEmail("test1@example.com");
+
+        client2 = new Client();
+        client2.setId(2);
+        client2.setUsername("testuser2");
+        client2.setPassword("password2");
+        client2.setEmail("test2@example.com");
     }
 
     @Test
-    void findAll_ShouldReturnClientList() {
-        when(clientRepository.findAll()).thenReturn(Arrays.asList(client));
+    void findAll_Success() {
+        when(clientRepository.findAll()).thenReturn(Arrays.asList(client1, client2));
         List<ClientGetDto> result = clientService.findAll();
-        assertEquals(1, result.size());
-        assertEquals("testuser", result.get(0).getUsername());
+        assertEquals(2, result.size());
+        assertEquals("testuser1", result.get(0).getUsername());
     }
 
     @Test
-    void findById_ShouldReturnClient_WhenClientExists() {
-        when(clientRepository.findById(1)).thenReturn(Optional.of(client));
+    void findById_Success() {
+        when(clientRepository.findById(1)).thenReturn(Optional.of(client1));
         Optional<ClientGetDto> result = clientService.findById(1);
         assertTrue(result.isPresent());
-        assertEquals("testuser", result.get().getUsername());
+        assertEquals("testuser1", result.get().getUsername());
     }
 
     @Test
-    void findById_ShouldThrowNotFoundException_WhenClientDoesNotExist() {
+    void findById_NotFound() {
         when(clientRepository.findById(1)).thenReturn(Optional.empty());
         assertThrows(NotFoundException.class, () -> clientService.findById(1));
     }
 
-/*    @Test
+  @Test
     void createUser_ShouldSaveAndReturnClient() {
         ClientCreateDto dto = new ClientCreateDto("newuser", "newpass", "new@example.com");
         Client newClient = new Client();
@@ -76,22 +83,22 @@ class ClientServiceTest {
     @Test
     void updateUser_ShouldUpdateAndReturnClient() {
         ClientUpdateDto dto = new ClientUpdateDto("updatedUser");
-        when(clientRepository.findById(1)).thenReturn(Optional.of(client));
-        when(clientRepository.save(any(Client.class))).thenReturn(client);
+        when(clientRepository.findById(1)).thenReturn(Optional.of(client1));
+        when(clientRepository.save(any(Client.class))).thenReturn(client1);
         ClientGetDto result = clientService.updateUser(1, dto);
         assertEquals("updatedUser", result.getUsername());
-    }*/
-
-    @Test
-    void deleteUser_ShouldDeleteClient_WhenClientExists() {
-        when(clientRepository.findById(1)).thenReturn(Optional.of(client));
-        doNothing().when(clientRepository).delete(client);
-        assertDoesNotThrow(() -> clientService.deleteUser(1));
-        verify(clientRepository, times(1)).delete(client);
     }
 
     @Test
-    void deleteUser_ShouldThrowNotFoundException_WhenClientDoesNotExist() {
+    void deleteUser_Success() {
+        when(clientRepository.findById(1)).thenReturn(Optional.of(client1));
+        doNothing().when(clientRepository).delete(client1);
+        assertDoesNotThrow(() -> clientService.deleteUser(1));
+        verify(clientRepository, times(1)).delete(client1);
+    }
+
+    @Test
+    void deleteUser_NotFound() {
         when(clientRepository.findById(1)).thenReturn(Optional.empty());
         assertThrows(NotFoundException.class, () -> clientService.deleteUser(1));
     }

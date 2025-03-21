@@ -8,11 +8,13 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 @Getter
+@AllArgsConstructor
 public class GoalCreateDto {
     @NotBlank(message = "Name cannot be null")
     @Size(min = 1, max = 100, message = "Name must be between 1 and 100 characters")

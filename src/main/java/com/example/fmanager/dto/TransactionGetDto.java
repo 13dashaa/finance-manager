@@ -10,7 +10,7 @@ import lombok.Setter;
 public class TransactionGetDto {
     private int id;
     private String description;
-    private Float amount;
+    private double amount;
     private int accountId;
     private int categoryId;
     private LocalDateTime date;
