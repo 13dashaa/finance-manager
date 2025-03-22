@@ -1,6 +1,5 @@
 HELP.md
 .gradle
-!**/build/reports/
 
 
 !gradle/wrapper/gradle-wrapper.jar
