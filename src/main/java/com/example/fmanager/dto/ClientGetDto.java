@@ -6,6 +6,7 @@ import com.example.fmanager.models.Client;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -11,10 +11,9 @@ jacoco {
 sonarqube {
     properties {
         property "sonar.host.url", "https://sonarcloud.io"
-        property "sonar.login", "b1c421278cea345691caba9cc57d5722a03f1d84"
+        property "sonar.token", System.getenv("SONAR_TOKEN")
         property "sonar.projectKey", "13dashaa_finance-manager"
         property "sonar.organization", "13dashaa"
-
         property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
     }
 }

@@ -28,7 +28,6 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @Column
     private String name;
     @Column(nullable = false)
     private double balance;

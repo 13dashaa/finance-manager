@@ -91,7 +91,12 @@ class GoalServiceTest {
 
     @Test
     void createGoal_Success() {
-        GoalCreateDto createDto = new GoalCreateDto("Save for vacation", BigDecimal.valueOf(10000), LocalDate.now(), LocalDate.now().plusYears(1), 1);
+        GoalCreateDto createDto = new GoalCreateDto(
+                "Save for vacation",
+                BigDecimal.valueOf(10000),
+                LocalDate.now(),
+                LocalDate.now().plusYears(1),
+                1);
 
         when(clientRepository.findById(1)).thenReturn(Optional.of(client));
         when(goalRepository.save(any(Goal.class))).thenReturn(goal);

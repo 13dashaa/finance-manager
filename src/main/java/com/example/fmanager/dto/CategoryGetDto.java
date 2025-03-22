@@ -14,8 +14,8 @@ import lombok.Setter;
 public class CategoryGetDto {
     private int id;
     private String name;
-    private Set<Integer> budgetIds;
-    private Set<Integer> transactionIds;
+    private Set<Integer> budgetIds = new HashSet<>();
+    private Set<Integer> transactionIds = new HashSet<>();
 
     public static CategoryGetDto convertToDto(Category category) {
         CategoryGetDto dto = new CategoryGetDto();

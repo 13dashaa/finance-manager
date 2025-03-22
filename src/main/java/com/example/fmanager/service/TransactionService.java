@@ -82,8 +82,8 @@ public class TransactionService {
         transaction.setAccount(transactionalAccount);
         Category category = categoryRepository.findById(transactionCreateDto.getCategoryId())
                 .orElseThrow(() -> new RuntimeException(CATEGORY_NOT_FOUND_MESSAGE));
-        Transaction savedTransaction = transactionRepository.save(transaction);
         transaction.setCategory(category);
+        Transaction savedTransaction = transactionRepository.save(transaction);
         Account account = accountRepository.findById(transaction.getAccount().getId())
                 .orElseThrow(() -> new IllegalArgumentException(ACCOUNT_NOT_FOUND_MESSAGE));
         clearCacheForClientAndCategory(account.getClient().getId(),

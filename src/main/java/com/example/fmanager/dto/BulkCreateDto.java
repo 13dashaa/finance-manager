@@ -1,7 +1,9 @@
 package com.example.fmanager.dto;
 
 import java.util.List;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 public class BulkCreateDto<T> {
     private List<T> items;
 

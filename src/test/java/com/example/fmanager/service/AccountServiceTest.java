@@ -12,8 +12,6 @@ import com.example.fmanager.models.Client;
 import com.example.fmanager.repository.AccountRepository;
 import com.example.fmanager.repository.CategoryRepository;
 import com.example.fmanager.repository.ClientRepository;
-import com.example.fmanager.service.InMemoryCache;
-import com.example.fmanager.service.TransactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -112,31 +110,6 @@ class AccountServiceTest {
         assertEquals("Account 1", result.get(0).getName());
         verify(cache, times(1)).put(cacheKey, result);
     }
-/*    @Test
-    void findByClientId_WithCache() {
-        List<Account> accounts = Arrays.asList(account1, account2);
-        when(cache.containsKey("accounts_client_1")).thenReturn(true);
-        when(cache.get("accounts_client_1")).thenReturn(accounts);
-
-        List<AccountGetDto> result = accountService.findByClientId(1);
-
-        assertEquals(2, result.size());
-        assertEquals("Account 1", result.get(0).getName());
-        verify(cache, times(1)).get("accounts_client_1");
-    }
-
-    @Test
-    void findByClientId_WithoutCache() {
-        List<Account> accounts = Arrays.asList(account1, account2);
-        when(cache.containsKey("accounts_client_1")).thenReturn(false);
-        when(accountRepository.findAllByClientId(1)).thenReturn(accounts);
-
-        List<AccountGetDto> result = accountService.findByClientId(1);
-
-        assertEquals(2, result.size());
-        assertEquals("Account 1", result.get(0).getName());
-        verify(cache, times(1)).put("accounts_client_1", accounts);
-    }*/
 
     @Test
     void createAccount_Success() {

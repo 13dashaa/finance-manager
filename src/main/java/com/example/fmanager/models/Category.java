@@ -1,5 +1,6 @@
 package com.example.fmanager.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -25,5 +26,6 @@ public class Category {
     @OneToMany(mappedBy = "category", fetch = FetchType.EAGER)
     private Set<Budget> budgets;
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    @JsonManagedReference
     private Set<Transaction> transactions;
 }

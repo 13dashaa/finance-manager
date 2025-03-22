@@ -1,6 +1,5 @@
 package com.example.fmanager.models;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -22,15 +21,10 @@ public class Goal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @Column
     private String name;
-    @Column
     private BigDecimal targetAmount;
-    @Column
     private BigDecimal currentAmount = BigDecimal.ZERO;
-    @Column
     private LocalDate startDate;
-    @Column
     private LocalDate endDate;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = false)
