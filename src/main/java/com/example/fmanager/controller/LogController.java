@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.NoSuchElementException;
+import java.util.concurrent.CompletableFuture;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -19,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,30 +35,61 @@ public class LogController {
         this.logService = logService;
     }
 
-    @Operation(summary = "Get logs for the specified date",
-            description = "Creates and returns a file with logs for the specified date.")
+    @Operation(summary = "Generate log file for the specified date",
+            description = "Starts asynchronous generation of a log file for the specified date.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "File successfully created and returned"),
-        @ApiResponse(responseCode = "204", description = "No logs found for the specified date"),
-        @ApiResponse(responseCode = "404", description = "File application.log not found"),
-        @ApiResponse(responseCode = "500", description = "Server error processing request")
+            @ApiResponse(responseCode = "200", description = "Task started successfully"),
+            @ApiResponse(responseCode = "500", description = "Server error processing request")
     })
-    @GetMapping("/{date}")
-    public ResponseEntity<Resource> getLogsByDate(@PathVariable LocalDate date) {
+    @PostMapping("/{date}")
+    public ResponseEntity<String> generateLogsByDate(@PathVariable LocalDate date) {
         try {
             String dateString = date.toString();
-            String logFilePath = logService.generateLogFileForDate(dateString);
+            CompletableFuture<String> future = logService.generateLogFileForDateAsync(dateString);
+            return ResponseEntity.ok("Task started. ID: " + future.get()); // Возвращаем ID задачи
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка: " + e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Get task status by ID",
+            description = "Returns the status of the task by its ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Task status retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Task ID not found")
+    })
+    @GetMapping("/{logId}/status")
+    public ResponseEntity<String> getTaskStatus(@PathVariable String logId) {
+        if (logService.isTaskCompleted(logId)) {
+            return ResponseEntity.ok("Task completed");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Task not found or not completed");
+        }
+    }
+
+    @Operation(summary = "Get log file by ID",
+            description = "Returns the log file by its ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "File successfully returned"),
+            @ApiResponse(responseCode = "404", description = "File not found"),
+            @ApiResponse(responseCode = "500", description = "Server error processing request")
+    })
+    @GetMapping("/{logId}/file")
+    public ResponseEntity<Resource> getLogFileById(@PathVariable String logId) {
+        try {
+            String logFilePath = logService.getLogFilePath(logId);
+            if (logFilePath == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+
             Path filePath = Paths.get(logFilePath);
             Resource resource = new UrlResource(filePath.toUri());
+
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION,
                             "attachment; filename=" + filePath.getFileName().toString())
                     .contentType(MediaType.TEXT_PLAIN)
                     .body(resource);
-        } catch (FileNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
