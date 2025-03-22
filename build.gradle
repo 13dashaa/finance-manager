@@ -8,20 +8,18 @@ plugins {
 jacoco {
     toolVersion = "0.8.11"
 }
-/*
-sonar {
+sonarqube {
     properties {
+        property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.login", "b1c421278cea345691caba9cc57d5722a03f1d84"
         property "sonar.projectKey", "13dashaa_finance-manager"
         property "sonar.organization", "13dashaa"
-        property "sonar.host.url", "https://sonarcloud.io"
-        property "sonar.projectName", "Finance Manager"
-        property "sonar.projectVersion", version
-        property "sonar.sources", "src/main/java"
-        property "sonar.tests", "src/test/java"
-        property "sonar.login", "b1c421278cea345691caba9cc57d5722a03f1d84"
+
+        property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
     }
 }
-*/
+
+
 
 
 group = 'com.example'
@@ -63,10 +61,10 @@ tasks.named('test') {
     finalizedBy jacocoTestReport
 }
 jacocoTestReport {
-    classDirectories.setFrom(files("build/classes/java/main")) // Путь к скомпилированным классам
-    sourceDirectories.setFrom(files("src/main/java"))
+
     reports {
         xml.required = true
         csv.required = false
+        html.required = true
     }
 }
