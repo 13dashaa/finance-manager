@@ -2,8 +2,8 @@ package com.example.fmanager.controller;
 
 import com.example.fmanager.dto.AccountCreateDto;
 import com.example.fmanager.dto.AccountGetDto;
-import com.example.fmanager.dto.BulkCreateDto;
 import com.example.fmanager.dto.AccountUpdateDto;
+import com.example.fmanager.dto.BulkCreateDto;
 import com.example.fmanager.models.Account;
 import com.example.fmanager.service.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
