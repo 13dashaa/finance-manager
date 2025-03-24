@@ -1,5 +1,6 @@
 package com.example.fmanager.controller;
 
+import java.util.HashMap;
 import java.util.Map;
 import com.example.fmanager.service.VisitCounterService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,9 @@ public class VisitCounterController {
     }
 
     @GetMapping("/total")
-    public ResponseEntity<Integer> getTotalVisitCount() {
-        int totalCount = visitCounterService.getTotalVisitCount();
+    public ResponseEntity<Map<String, Integer>> getTotalVisitCount() {
+        Map<String, Integer> totalCount = new HashMap<>();
+        totalCount.put("total", visitCounterService.getTotalVisitCount());
         return ResponseEntity.ok(totalCount);
     }
 
