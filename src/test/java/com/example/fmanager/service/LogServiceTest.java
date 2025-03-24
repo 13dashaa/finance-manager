@@ -1,102 +1,83 @@
 package com.example.fmanager.service;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-@ExtendWith(MockitoExtension.class)
 class LogServiceTest {
 
-    @InjectMocks
     private LogService logService;
 
-    private final String testDate = "21.03.2025";
-    private final String logFileName = "logs/logs-21.03.2025.log";
+    @TempDir
+    Path tempDir;
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp() {
+        logService = new LogService();
+    }
 
-        Path logsDir = Paths.get("logs/");
-        if (!Files.exists(logsDir)) {
-            Files.createDirectories(logsDir);
+    @Test
+    void generateLogFileForDateAsync_FileNotFound_ShouldThrowException() {
+        CompletableFuture<String> future = logService.generateLogFileForDateAsync("2025-03-15");
+        ExecutionException exception = assertThrows(ExecutionException.class, future::get);
+        assertTrue(exception.getCause() instanceof RuntimeException);
+    }
+
+    @Test
+    void generateLogFileForDateAsync_NoLogsForDate_ShouldThrowException() throws IOException {
+        Path logFile = tempDir.resolve("application.log");
+        Files.write(logFile, "Other log entry".getBytes());
+
+        try (MockedStatic<Paths> pathsMockedStatic = Mockito.mockStatic(Paths.class)) {
+            pathsMockedStatic.when(() -> Paths.get("logs/application.log")).thenReturn(logFile);
+
+            CompletableFuture<String> future = logService.generateLogFileForDateAsync("2025-03-15");
+
+            ExecutionException exception = assertThrows(ExecutionException.class, future::get);
+            assertTrue(exception.getCause() instanceof NoSuchElementException);
         }
     }
 
     @Test
-    void generateLogFileForDate_Success() throws IOException {
+    void generateLogFileForDateAsync_ValidLogs_ShouldGenerateFile()
+            throws IOException, ExecutionException, InterruptedException {
+        Path logFile = tempDir.resolve("application.log");
+        String logEntry = "2025-03-22 12:00:00 INFO Some log message";
+        Files.write(logFile, logEntry.getBytes());
+        Path logsDir = tempDir.resolve("logs");
+        Files.createDirectories(logsDir);
 
-        Path logPath = Paths.get("logs/application.log");
-        List<String> filteredLines = List.of(
-                "21.03.2025 10:00:00 - INFO: Application started",
-                "21.03.2025 10:05:00 - INFO: User logged in"
-        );
+        try (MockedStatic<Paths> pathsMockedStatic = Mockito.mockStatic(Paths.class)) {
+            pathsMockedStatic.when(() -> Paths.get("logs/application.log")).thenReturn(logFile);
+            pathsMockedStatic.when(() -> Paths.get("logs/")).thenReturn(logsDir);
 
-        try (MockedStatic<Files> filesMock = Mockito.mockStatic(Files.class)) {
-            filesMock.when(() -> Files.exists(logPath)).thenReturn(true);
-            filesMock.when(() -> Files.lines(logPath)).thenReturn(filteredLines.stream());
-            filesMock.when(() -> Files.write(any(Path.class), anyList())).thenReturn(Paths.get(logFileName));
-
-            String result = logService.generateLogFileForDate(testDate);
-
-            assertEquals(logFileName, result);
-            filesMock.verify(() -> Files.write(Paths.get(logFileName), filteredLines), times(1));
+            CompletableFuture<String> future = logService.generateLogFileForDateAsync("2025-03-22");
+            String logId = future.get();
+            assertNotNull(logId);
+            assertTrue(logService.getLogFilePath(logId).contains("logs-2025-03-22.log"));
+            assertTrue(logService.isTaskCompleted(logId));
         }
     }
 
     @Test
-    void generateLogFileForDate_FileNotFound() {
-
-        Path logPath = Paths.get("logs/application.log");
-
-        try (MockedStatic<Files> filesMock = Mockito.mockStatic(Files.class)) {
-            filesMock.when(() -> Files.exists(logPath)).thenReturn(false);
-
-            assertThrows(FileNotFoundException.class, () -> logService.generateLogFileForDate(testDate));
-        }
+    void getLogFilePath_NonExistingLogId_ShouldReturnNull() {
+        assertNull(logService.getLogFilePath(UUID.randomUUID().toString()));
     }
 
     @Test
-    void generateLogFileForDate_NoLogsForDate(){
-        Path logPath = Paths.get("logs/application.log");
-        List<String> filteredLines = List.of();
-
-        try (MockedStatic<Files> filesMock = Mockito.mockStatic(Files.class)) {
-            filesMock.when(() -> Files.exists(logPath)).thenReturn(true);
-            filesMock.when(() -> Files.lines(logPath)).thenReturn(filteredLines.stream());
-
-            assertThrows(NoSuchElementException.class, () -> logService.generateLogFileForDate(testDate));
-        }
-    }
-
-    @Test
-    void generateLogFileForDate_IOException(){
-
-        Path logPath = Paths.get("logs/application.log");
-        List<String> filteredLines = List.of(
-                "21.03.2025 10:00:00 - INFO: Application started"
-        );
-
-        try (MockedStatic<Files> filesMock = Mockito.mockStatic(Files.class)) {
-            filesMock.when(() -> Files.exists(logPath)).thenReturn(true);
-            filesMock.when(() -> Files.lines(logPath)).thenReturn(filteredLines.stream());
-            filesMock.when(() -> Files.write(any(Path.class), anyList())).thenThrow(new IOException("Failed to write file"));
-
-            assertThrows(IOException.class, () -> logService.generateLogFileForDate(testDate));
-        }
+    void isTaskCompleted_NonExistingLogId_ShouldReturnFalse() {
+        assertFalse(logService.isTaskCompleted(UUID.randomUUID().toString()));
     }
 }
