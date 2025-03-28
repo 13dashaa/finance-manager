@@ -1,5 +1,6 @@
 package com.example.fmanager.service;
 
+import com.example.fmanager.exception.NoDataToFileException;
 import com.example.fmanager.exception.ProcessingFileException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -48,7 +49,7 @@ public class LogService {
                 }
 
                 if (filteredLines.isEmpty()) {
-                    throw new NoSuchElementException("No logs found for the given date");
+                    throw new NoDataToFileException("No logs found for the given date");
                 }
 
                 Files.createDirectories(Paths.get(LOGS_DIR));
@@ -69,6 +70,8 @@ public class LogService {
                 taskStatus.put(logId, true);
 
                 return logId;
+            } catch (FileNotFoundException e) {
+                throw new ProcessingFileException("Log file not found"); // Явное преобразование
             } catch (IOException e) {
                 String logId = UUID.randomUUID().toString();
                 taskStatus.put(logId, false);

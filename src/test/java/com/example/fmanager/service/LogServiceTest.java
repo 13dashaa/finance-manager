@@ -6,10 +6,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import com.example.fmanager.exception.NoDataToFileException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -46,7 +46,7 @@ class LogServiceTest {
             CompletableFuture<String> future = logService.generateLogFileForDateAsync("2025-03-15");
 
             ExecutionException exception = assertThrows(ExecutionException.class, future::get);
-            assertTrue(exception.getCause() instanceof NoSuchElementException);
+            assertTrue(exception.getCause() instanceof NoDataToFileException);
         }
     }
 

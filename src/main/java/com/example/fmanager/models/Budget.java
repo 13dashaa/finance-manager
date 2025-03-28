@@ -35,6 +35,7 @@ public class Budget {
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
     @Column(nullable = false)
     private double limitation;
     private int period;

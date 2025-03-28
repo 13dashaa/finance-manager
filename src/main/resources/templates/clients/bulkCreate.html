@@ -1,0 +1,31 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Bulk Create Clients</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1>Bulk Create Clients</h1>
+    <form th:action="@{/clients/bulk}" th:object="${bulkCreateDto}" method="post">
+        <div th:each="i : ${#numbers.sequence(0, 2)}"> <!-- Создаем 3 формы -->
+            <h2>Client <th:block th:text="${i + 1}"/></h2>
+            <div class="form-group">
+                <label th:for="'username' + ${i}">Username:</label>
+                <input type="text" class="form-control" th:id="'username' + ${i}" th:name="items[__${i}__].username" required/>
+            </div>
+            <div class="form-group">
+                <label th:for="'email' + ${i}">Email:</label>
+                <input type="email" class="form-control" th:id="'email' + ${i}" th:name="items[__${i}__].email" required/>
+            </div>
+            <div class="form-group">
+                <label th:for="'password' + ${i}">Password:</label>
+                <input type="password" class="form-control" th:id="'password' + ${i}" th:name="items[__${i}__].password" required/>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Clients</button>
+    </form>
+    <a href="/clients" class="btn btn-secondary">Back to List</a>
+</div>
+</body>
+</html>

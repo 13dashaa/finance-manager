@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -50,8 +49,6 @@ public class LogController {
             Thread.currentThread().interrupt();
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                     .body("Task had been interrupted: " + e.getMessage());
-        } catch (ExecutionException e) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Error: " + e.getMessage());
