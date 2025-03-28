@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Client Details</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1>Client Details</h1>
+    <dl>
+        <dt>ID</dt>
+        <dd th:text="${client.id}"></dd>
+        <dt>Name</dt>
+        <dd th:text="${client.username}"></dd>
+        <dt>Email</dt>
+        <dd th:text="${client.email}"></dd>
+        <dt>Account Names</dt>
+        <dd>
+            <ul th:if="${not #lists.isEmpty(client.accountNames)}">
+                <li th:each="accountName : ${client.accountNames}" th:text="${accountName}"></li>
+            </ul>
+            <p th:unless="${not #lists.isEmpty(client.accountNames)}">No accounts found.</p>
+        </dd>
+
+        <dt>Budget Category Names</dt>
+        <dd>
+            <ul th:if="${not #lists.isEmpty(client.budgetCategoryNames)}">
+                <li th:each="categoryName : ${client.budgetCategoryNames}" th:text="${categoryName}"></li>
+            </ul>
+            <p th:unless="${not #lists.isEmpty(client.budgetCategoryNames)}">No budgets found.</p>
+        </dd>
+    </dl>
+
+    <a th:href="@{/clients/edit/{id}(id=${client.id})}" class="btn btn-primary">Edit</a>
+    <a href="/clients" class="btn btn-secondary">Back to List</a>
+</div>
+</body>
+</html>

@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.util.Collections;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 @Controller // Изменено: использовать @Controller вместо @RestController
@@ -109,8 +111,11 @@ public class ClientController {
     }
 
     @GetMapping("/bulk")
-    public String showBulkCreateForm(Model model) {
-        model.addAttribute("bulkCreateDto", new BulkCreateDto<ClientCreateDto>());
+    public String showBulkCreateForm(@RequestParam(name = "count", defaultValue = "3") int count,
+                                     Model model) {
+        BulkCreateDto<ClientCreateDto> bulkCreateDto = new BulkCreateDto<>(Collections.nCopies(count, new ClientCreateDto("", "", "")));
+        model.addAttribute("bulkCreateDto", bulkCreateDto);
+        model.addAttribute("count", count);
         return "clients/bulkCreate"; // Имя Thymeleaf-шаблона для bulk create
     }
 

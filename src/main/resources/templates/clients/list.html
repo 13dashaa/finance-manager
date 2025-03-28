@@ -1,0 +1,33 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Clients</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1>Clients</h1>
+    <a href="/clients/new" class="btn btn-primary">Create New Client</a>
+    <a href="/clients/bulk" class="btn btn-success">Create Clients in Bulk</a>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="client : ${clients}">
+            <td th:text="${client.username}"></td>
+            <td th:text="${client.email}"></td>
+            <td>
+                <a th:href="@{/clients/{id}(id=${client.id})}" class="btn btn-sm btn-info">View</a>
+                <a th:href="@{/clients/delete/{id}(id=${client.id})}" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
