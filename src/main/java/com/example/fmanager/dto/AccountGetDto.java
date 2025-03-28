@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
-
 @Getter
 @Setter
 public class AccountGetDto {
@@ -18,21 +17,21 @@ public class AccountGetDto {
     private double balance;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private int clientId;
-    private Set<Integer> transactionIds;
+    private String clientUsername;
+    private Set<String> transactionDescriptions;
 
     public static AccountGetDto convertToDto(Account account) {
         AccountGetDto dto = new AccountGetDto();
         dto.setId(account.getId());
         Set<Transaction> transactions = account.getTransactions();
         if (transactions != null) {
-            dto.setTransactionIds(account.getTransactions().stream()
-                    .map(Transaction::getId)
+            dto.setTransactionDescriptions(account.getTransactions().stream()
+                    .map(Transaction::getDescription)
                     .collect(Collectors.toSet()));
         } else {
-            dto.setTransactionIds(new HashSet<>());
+            dto.setTransactionDescriptions(new HashSet<>());
         }
-        dto.setClientId(account.getClient().getId());
+        dto.setClientUsername(account.getClient().getUsername());
         dto.setName(account.getName());
         dto.setBalance(account.getBalance());
         dto.setCreatedAt(account.getCreatedAt());

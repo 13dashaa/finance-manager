@@ -1,57 +1,36 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
   <title>Account Details</title>
-
-  <link rel="stylesheet" href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-<div class="container mt-4">
-  <div class="card">
-    <div class="card-header bg-primary text-white">
-      <h2>Account Details</h2>
-    </div>
-    <div class="card-body">
-      <div class="row mb-4">
-        <div class="col-md-6">
-          <h4>Basic Information</h4>
-          <p><strong>ID:</strong> <span th:text="${account.id}"></span></p>
-          <p><strong>Name:</strong> <span th:text="${account.name}"></span></p>
-          <p><strong>Balance:</strong> <span th:text="${account.balance}"></span></p>
-          <p><strong>Client ID:</strong> <span th:text="${account.clientId}"></span></p>
-        </div>
+<div class="container">
+  <h1>Account Details</h1>
+  <dl>
+    <dt>ID</dt>
+    <dd th:text="${account.id}"></dd>
+    <dt>Name</dt>
+    <dd th:text="${account.name}"></dd>
+    <dt>Balance</dt>
+    <dd th:text="${account.balance}"></dd>
+    <dt>Client</dt>
+    <dd th:text="${account.clientUsername}"></dd>
+    <dt>Created At</dt>
+    <dd th:text="${account.createdAt}"></dd>
+    <dt>Updated At</dt>
+    <dd th:text="${account.updatedAt}"></dd>
+    <dt>Transaction</dt>
+    <dd>
+      <ul th:if="${not #sets.isEmpty(account.transactionDescriptions)}">
+        <li th:each="description : ${account.transactionDescriptions}" th:text="${description}"></li>
+      </ul>
+      <p th:unless="${not #sets.isEmpty(account.transactionDescriptions)}">No transactions found.</p>
+    </dd>
+  </dl>
 
-        <div class="col-md-6">
-          <h4>Timestamps</h4>
-          <p><strong>Created At:</strong> <span th:text="${account.createdAt}"></span></p>
-          <p><strong>Updated At:</strong> <span th:text="${account.updatedAt}"></span></p>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-12">
-          <h4>Transaction IDs (ManyToMany)</h4>
-          <div th:if="${not #sets.isEmpty(account.transactionIds)}">
-            <div class="d-flex flex-wrap gap-2">
-              <div th:each="transId : ${account.transactionIds}"
-                   class="badge bg-primary p-2">
-                ID: <span th:text="${transId}"></span>
-              </div>
-            </div>
-          </div>
-          <div th:if="${#sets.isEmpty(account.transactionIds)}" class="alert alert-info">
-            No transactions associated with this account
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="card-footer">
-      <a th:href="@{/ui/accounts/list}" class="btn btn-secondary">Back to List</a>
-    </div>
-  </div>
+  <a th:href="@{/accounts/edit/{id}(id=${account.id})}" class="btn btn-primary">Edit</a>
+  <a href="/accounts" class="btn btn-secondary">Back to List</a>
 </div>
-<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
-<script src="/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

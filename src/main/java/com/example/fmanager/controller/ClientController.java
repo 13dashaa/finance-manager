@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 @Controller // Изменено: использовать @Controller вместо @RestController
@@ -109,22 +112,24 @@ public class ClientController {
     }
 
     @GetMapping("/bulk")
-    public String showBulkCreateForm(Model model) {
-        model.addAttribute("bulkCreateDto", new BulkCreateDto<ClientCreateDto>());
-        return "clients/bulkCreate"; // Имя Thymeleaf-шаблона для bulk create
+    public String showBulkCreateForm(@RequestParam(name = "count", defaultValue = "1") int count,
+                                     Model model) {
+        List<ClientCreateDto> clientCreateDtos = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            clientCreateDtos.add(new ClientCreateDto("", "", ""));
+        }
+        BulkCreateDto<ClientCreateDto> bulkCreateDto = new BulkCreateDto<>(clientCreateDtos);
+        model.addAttribute("bulkCreateDto", bulkCreateDto);
+        model.addAttribute("count", count);
+        return "clients/bulkCreate";
     }
 
     @PostMapping("/bulk")
-    @Operation(summary = "Create multiple clients",
-            description = "Creates multiple clients with the provided details")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Clients created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input")
-    })
     public String createClientsBulk(
             @Valid @ModelAttribute("bulkCreateDto") BulkCreateDto<ClientCreateDto> bulkCreateDto,
             BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
+            model.addAttribute("bulkCreateDto", bulkCreateDto); // Add this line
             return "clients/bulkCreate";
         }
 

@@ -1,0 +1,31 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create Account</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1>Create Account</h1>
+    <form th:action="@{/accounts}" th:object="${accountCreateDto}" method="post">
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" class="form-control" id="name" th:field="*{name}" required>
+            <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label for="balance">Balance:</label>
+            <input type="number" class="form-control" id="balance" th:field="*{balance}" required>
+            <span th:if="${#fields.hasErrors('balance')}" th:errors="*{balance}" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label for="clientId">Client ID:</label>
+            <input type="number" class="form-control" id="clientId" th:field="*{clientId}" required>
+            <span th:if="${#fields.hasErrors('clientId')}" th:errors="*{clientId}" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">Create</button>
+    </form>
+    <a href="/accounts" class="btn btn-secondary">Back to List</a>
+</div>
+</body>
+</html>

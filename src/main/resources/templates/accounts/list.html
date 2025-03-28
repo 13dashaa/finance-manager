@@ -1,52 +1,41 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>Accounts List</title>
-  <link rel="stylesheet" href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css">
+  <title>Accounts</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-<div class="container mt-4">
-  <h1 class="mb-4">All Accounts</h1>
+<div class="container">
+  <h1>Accounts</h1>
+  <a href="/accounts/new" class="btn btn-primary">Create New Account</a>
+  <a href="/accounts/bulk" class="btn btn-success">Create Accounts in Bulk</a>
 
-  <table class="table table-striped">
-    <thead class="table-dark">
+  <div th:if="${clientId}">
+    <h2>Accounts for Client Username: <span th:text="${clientId}"></span></h2>
+  </div>
+
+  <table class="table">
+    <thead>
     <tr>
-      <th>ID</th>
       <th>Name</th>
       <th>Balance</th>
-      <th>Client ID</th>
-      <th>Transactions</th>
-      <th>Created At</th>
+      <th>Client</th>
       <th>Actions</th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="account : ${accounts}">
-      <td th:text="${account.id}"></td>
       <td th:text="${account.name}"></td>
       <td th:text="${account.balance}"></td>
-      <td th:text="${account.clientId}"></td>
+      <td th:text="${account.clientUsername}"></td>
       <td>
-        <span th:if="${not #sets.isEmpty(account.transactionIds)}">
-          <span th:each="transId : ${account.transactionIds}"
-                class="badge bg-secondary me-1"
-                th:text="${transId}">
-          </span>
-        </span>
-        <span th:if="${#sets.isEmpty(account.transactionIds)}" class="text-muted">No transactions</span>
-      </td>
-      <td th:text="${account.createdAt}"></td>
-      <td>
-        <!-- Исправленная ссылка - убрал /ui из пути -->
-        <a th:href="@{/accounts/details/{id}(id=${account.id})}"
-           class="btn btn-sm btn-info">Details</a>
+        <a th:href="@{/accounts/{id}(id=${account.id})}" class="btn btn-sm btn-info">View</a>
+        <a th:href="@{/accounts/edit/{id}(id=${account.id})}" class="btn btn-sm btn-warning">Edit</a>
+        <a th:href="@{/accounts/delete/{id}(id=${account.id})}" class="btn btn-sm btn-danger">Delete</a>
       </td>
     </tr>
     </tbody>
   </table>
 </div>
-<script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
-<script src="/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
