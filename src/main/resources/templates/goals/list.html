@@ -1,0 +1,35 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Goals</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1>Goals</h1>
+    <a href="/goals/new" class="btn btn-primary">Create New Goal</a>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Target Amount</th>
+            <th>End Date</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="goal : ${goals}">
+            <td th:text="${goal.name}"></td>
+            <td th:text="${goal.targetAmount}"></td>
+            <td th:text="${goal.endDate}"></td>
+            <td>
+                <a th:href="@{/goals/{id}(id=${goal.id})}" class="btn btn-sm btn-info">View</a>
+                <a th:href="@{/goals/edit/{id}(id=${goal.id})}" class="btn btn-sm btn-warning">Edit</a>
+                <a th:href="@{/goals/delete/{id}(id=${goal.id})}" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

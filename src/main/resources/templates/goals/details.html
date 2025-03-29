@@ -1,0 +1,32 @@
+
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Goal Details</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1>Goal Details</h1>
+    <dl>
+        <dt>Name</dt>
+        <dd th:text="${goal.name}"></dd>
+        <dt>Target Amount</dt>
+        <dd th:text="${goal.targetAmount}"></dd>
+        <dt>Current Amount</dt>
+        <dd th:text="${goal.currentAmount}"></dd>
+        <dt>Start Date</dt>
+        <dd th:text="${goal.startDate}"></dd>
+        <dt>End Date</dt>
+        <dd th:text="${goal.endDate}"></dd>
+        <dt>Client</dt>
+        <dd>
+            <a th:href="@{/clients/{id}(id=${goal.clientId})}" th:text="${goal.clientUsername}"></a>
+        </dd>
+    </dl>
+
+    <a th:href="@{/goals/edit/{id}(id=${goal.id})}" class="btn btn-primary">Edit</a>
+    <a href="/goals" class="btn btn-secondary">Back to List</a>
+</div>
+</body>
+</html>

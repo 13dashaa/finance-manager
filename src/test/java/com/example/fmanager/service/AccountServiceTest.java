@@ -88,10 +88,10 @@ class AccountServiceTest {
     }
 
     @Test
-    void getAllAccounts() {
+    void findAll() {
         when(accountRepository.findAll()).thenReturn(Arrays.asList(account1, account2));
 
-        List<AccountGetDto> result = accountService.getAllAccounts();
+        List<AccountGetDto> result = accountService.findAll();
 
         assertEquals(2, result.size());
         assertEquals("Account 1", result.get(0).getName());

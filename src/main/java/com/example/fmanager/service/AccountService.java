@@ -44,7 +44,7 @@ public class AccountService {
         return Optional.of(AccountGetDto.convertToDto(account));
     }
 
-    public List<AccountGetDto> getAllAccounts() {
+    public List<AccountGetDto> findAll() {
         List<Account> accounts = accountRepository.findAll();
         List<AccountGetDto> accountGetDtos = new ArrayList<>();
         for (Account account : accounts) {
@@ -113,5 +113,9 @@ public class AccountService {
                 .orElseThrow(() -> new NotFoundException(ACCOUNT_NOT_FOUND_MESSAGE));
         clearCacheForClient(account.getClient().getId());
         accountRepository.delete(account);
+    }
+
+    public List<Account> getAllAccounts() {
+        return accountRepository.findAll();
     }
 }

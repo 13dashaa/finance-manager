@@ -15,12 +15,14 @@ public class GoalGetDto {
     private BigDecimal currentAmount = BigDecimal.ZERO;
     private LocalDate startDate;
     private LocalDate endDate;
-    private int clientId;
+    private Integer clientId;
+    private String clientUsername;
 
     public static GoalGetDto convertToDto(Goal goal) {
         GoalGetDto dto = new GoalGetDto();
         dto.setId(goal.getId());
         dto.setClientId(goal.getClient().getId());
+        dto.setClientUsername(goal.getClient().getUsername());
         dto.setName(goal.getName());
         dto.setTargetAmount(goal.getTargetAmount());
         dto.setCurrentAmount(goal.getCurrentAmount());

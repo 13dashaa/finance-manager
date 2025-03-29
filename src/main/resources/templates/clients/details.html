@@ -21,7 +21,15 @@
             </ul>
             <p th:unless="${not #lists.isEmpty(client.accountNames)}">No accounts found.</p>
         </dd>
-
+        <dt>Goals</dt>
+        <dd>
+            <ul th:if="${not #lists.isEmpty(client.goalNames)}">
+                <li th:each="goalName, i : ${client.goalNames}">
+                    <a th:href="@{/goals/{id}(id=${client.goalIds.toArray()[i.index]})}" th:text="${goalName}"></a>
+                </li>
+            </ul>
+            <p th:unless="${not #lists.isEmpty(client.goalNames)}">No goals found.</p>
+        </dd>
         <dt>Budget Category Names</dt>
         <dd>
             <ul th:if="${not #lists.isEmpty(client.budgetCategoryNames)}">

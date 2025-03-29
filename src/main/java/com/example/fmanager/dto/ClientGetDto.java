@@ -6,6 +6,7 @@ import com.example.fmanager.models.Client;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import com.example.fmanager.models.Goal;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +22,8 @@ public class ClientGetDto {
     private Set<Integer> budgetIds;
     private Set<String> accountNames;
     private Set<Integer> accountIds;
+    private Set<String> goalNames;
+    private Set<Integer> goalIds;
 
     public static ClientGetDto convertToDto(Client client) {
         ClientGetDto dto = new ClientGetDto();
@@ -51,7 +54,18 @@ public class ClientGetDto {
             dto.setBudgetCategoryNames(new HashSet<>());
             dto.setBudgetIds(new HashSet<>());
         }
-
+        Set<Goal> goals = client.getGoals();
+        if (goals != null) {
+            dto.setGoalNames(goals.stream()
+                    .map(Goal::getName)
+                    .collect(Collectors.toSet()));
+            dto.setGoalIds(goals.stream()
+                    .map(Goal::getId)
+                    .collect(Collectors.toSet()));
+        } else {
+            dto.setGoalIds(new HashSet<>());
+            dto.setGoalNames(new HashSet<>());
+        }
         return dto;
     }
 }

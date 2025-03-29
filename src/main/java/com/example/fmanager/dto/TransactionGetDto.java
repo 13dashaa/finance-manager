@@ -12,7 +12,9 @@ public class TransactionGetDto {
     private String description;
     private double amount;
     private int accountId;
+    private String accountName;
     private int categoryId;
+    private String categoryName;
     private LocalDateTime date;
     private LocalDateTime createdAt;
 
@@ -25,6 +27,8 @@ public class TransactionGetDto {
         dto.setDescription(transaction.getDescription());
         dto.setDate(transaction.getDate());
         dto.setCreatedAt(transaction.getCreatedAt());
+        dto.setCategoryName(transaction.getCategory().getName());
+        dto.setAccountName(transaction.getAccount().getName());
         return dto;
     }
 }

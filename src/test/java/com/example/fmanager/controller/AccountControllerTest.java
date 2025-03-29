@@ -55,7 +55,7 @@ class AccountControllerTest {
 
     @Test
     void getAccounts_ReturnsList() {
-        when(accountService.getAllAccounts()).thenReturn(List.of(accountGetDto));
+        when(accountService.findAll()).thenReturn(List.of(accountGetDto));
 
         List<AccountGetDto> result = accountController.getAccounts();
 
