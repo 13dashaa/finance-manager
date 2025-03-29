@@ -16,7 +16,9 @@ public class BudgetGetDto {
 
     private int id;
     private Set<Integer> clientIds;
+    private Set<String> clientUsernames;
     private Integer categoryId;
+    private String categoryName;
     private double limitation;
     private int period;
     private LocalDateTime createdAt;
@@ -30,9 +32,14 @@ public class BudgetGetDto {
             dto.setClientIds(budget.getClients().stream()
                     .map(Client::getId)
                     .collect(Collectors.toSet()));
+            dto.setClientUsernames(budget.getClients().stream()
+                    .map(Client::getUsername)
+                    .collect(Collectors.toSet()));
         } else {
             dto.setClientIds(new HashSet<>());
+            dto.setClientUsernames(new HashSet<>());
         }
+        dto.setCategoryName(budget.getCategory().getName());
         dto.setCategoryId(budget.getCategory().getId());
         dto.setLimitation(budget.getLimitation());
         dto.setPeriod(budget.getPeriod());

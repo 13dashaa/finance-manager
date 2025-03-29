@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Budget Details</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1>Budget Details</h1>
+    <dl>
+        <dt>ID</dt>
+        <dd th:text="${budget.id}"></dd>
+        <dt>Category</dt>
+        <dd>
+            <a th:href="@{/categories/{id}(id=${budget.categoryId})}" th:text="${budget.categoryName}"></a>
+        </dd>
+        <dt>Limitation</dt>
+        <dd th:text="${budget.limitation}"></dd>
+        <dt>Period</dt>
+        <dd th:text="${budget.period}"></dd>
+        <dt>Created At</dt>
+        <dd th:text="${budget.createdAt}"></dd>
+        <dt>Updated At</dt>
+        <dd th:text="${budget.updatedAt}"></dd>
+        <dt>Clients</dt>
+        <dd>
+            <ul th:if="${not #sets.isEmpty(budget.clientUsernames)}">
+                <li th:each="clientUsername, i : ${budget.clientUsernames}" >
+                    <a th:href="@{/clients/{id}(id=${budget.clientIds.toArray()[i.index]})}" th:text="${clientUsername}"></a>
+                </li>
+            </ul>
+            <p th:unless="${not #sets.isEmpty(budget.clientUsernames)}">No clients found.</p>
+        </dd>
+    </dl>
+
+    <a th:href="@{/budgets/edit/{id}(id=${budget.id})}" class="btn btn-primary">Edit</a>
+    <a href="/budgets" class="btn btn-secondary">Back to List</a>
+</div>
+</body>
+</html>

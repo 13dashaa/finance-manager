@@ -16,12 +16,12 @@ import lombok.Setter;
 public class BudgetCreateDto {
     @NotNull(message = "Period cannot be null")
     @Future(message = "The end of period must be in future.")
-    private int period;
+    private Integer period;
     @NotNull(message = "Limitation cannot be null")
     @Positive(message = "Limitation cannot be negative")
     private double limitation;
     @Min(value = 1, message = "Only one category ID must be provided")
-    private int categoryId;
+    private Integer categoryId;
     @Size(min = 1, message = "At least one client ID must be provided")
     private Set<Integer> clientIds;
 }

@@ -18,31 +18,39 @@ public class ClientGetDto {
     private String username;
     private String email;
     private Set<String> budgetCategoryNames;
+    private Set<Integer> budgetIds;
     private Set<String> accountNames;
+    private Set<Integer> accountIds;
 
     public static ClientGetDto convertToDto(Client client) {
         ClientGetDto dto = new ClientGetDto();
         dto.setId(client.getId());
+        dto.setUsername(client.getUsername());
+        dto.setEmail(client.getEmail());
         Set<Account> accounts = client.getAccounts();
         if (accounts != null) {
             dto.setAccountNames(accounts.stream()
-                    .map(Account::getName) // Предполагается, что у Account есть метод getName()
+                    .map(Account::getName)
+                    .collect(Collectors.toSet()));
+            dto.setAccountIds(accounts.stream()
+                    .map(Account::getId)
                     .collect(Collectors.toSet()));
         } else {
             dto.setAccountNames(new HashSet<>());
+            dto.setAccountIds(new HashSet<>());
         }
-
-        // Получаем имена бюджетов
         Set<Budget> budgets = client.getBudgets();
         if (budgets != null) {
             dto.setBudgetCategoryNames(budgets.stream()
-                    .map(budget -> budget.getCategory().getName()) // Предполагается, что у Budget есть метод getName()
+                    .map(budget -> budget.getCategory().getName())
+                    .collect(Collectors.toSet()));
+            dto.setBudgetIds(budgets.stream()
+                    .map(Budget::getId)
                     .collect(Collectors.toSet()));
         } else {
             dto.setBudgetCategoryNames(new HashSet<>());
+            dto.setBudgetIds(new HashSet<>());
         }
-        dto.setUsername(client.getUsername());
-        dto.setEmail(client.getEmail());
 
         return dto;
     }

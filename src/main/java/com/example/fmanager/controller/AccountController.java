@@ -5,7 +5,9 @@ import com.example.fmanager.dto.AccountGetDto;
 import com.example.fmanager.dto.AccountUpdateDto;
 import com.example.fmanager.dto.BulkCreateDto;
 import com.example.fmanager.models.Account;
+import com.example.fmanager.models.Client;
 import com.example.fmanager.service.AccountService;
+import com.example.fmanager.service.ClientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -35,14 +37,18 @@ import org.springframework.web.server.ResponseStatusException;
 public class AccountController {
 
     private final AccountService accountService;
+    private final ClientService clientService;
 
-    public AccountController(AccountService accountService) {
+    public AccountController(AccountService accountService, ClientService clientService) {
         this.accountService = accountService;
+        this.clientService = clientService;
     }
 
     @GetMapping("/new")
     public String showCreateForm(Model model) {
-        model.addAttribute("accountCreateDto", new AccountCreateDto("", 0.0, 0));
+        model.addAttribute("accountCreateDto", new AccountCreateDto("", 0.0, null));
+        List<Client> clients = clientService.findAllClients();
+        model.addAttribute("clients", clients);
         return "accounts/create";
     }
 

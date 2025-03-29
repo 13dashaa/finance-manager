@@ -69,6 +69,10 @@ public class CategoryService {
         categoryRepository.delete(category);
     }
 
+    public List<Category> getAllCategories() {
+        return categoryRepository.findAll();
+    }
+
     public void clearCategoryCache() {
         String cacheKey = "all_categories";
         cache.remove(cacheKey);

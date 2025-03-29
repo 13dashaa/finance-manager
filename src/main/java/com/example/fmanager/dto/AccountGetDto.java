@@ -14,6 +14,7 @@ public class AccountGetDto {
 
     private int id;
     private String name;
+    private int clientId;
     private double balance;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -33,6 +34,7 @@ public class AccountGetDto {
         }
         dto.setClientUsername(account.getClient().getUsername());
         dto.setName(account.getName());
+        dto.setClientId(account.getClient().getId());
         dto.setBalance(account.getBalance());
         dto.setCreatedAt(account.getCreatedAt());
         dto.setUpdatedAt(account.getUpdatedAt());

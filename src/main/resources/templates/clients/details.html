@@ -15,7 +15,9 @@
         <dt>Account Names</dt>
         <dd>
             <ul th:if="${not #lists.isEmpty(client.accountNames)}">
-                <li th:each="accountName : ${client.accountNames}" th:text="${accountName}"></li>
+                <li th:each="accountName, i : ${client.accountNames}">
+                    <a th:href="@{/accounts/{id}(id=${client.accountIds.toArray()[i.index]})}" th:text="${accountName}"></a>
+                </li>
             </ul>
             <p th:unless="${not #lists.isEmpty(client.accountNames)}">No accounts found.</p>
         </dd>
@@ -23,7 +25,9 @@
         <dt>Budget Category Names</dt>
         <dd>
             <ul th:if="${not #lists.isEmpty(client.budgetCategoryNames)}">
-                <li th:each="categoryName : ${client.budgetCategoryNames}" th:text="${categoryName}"></li>
+                <li th:each="categoryName, i : ${client.budgetCategoryNames}">
+                    <a th:href="@{/budgets/{id}(id=${client.budgetIds.toArray()[i.index]})}" th:text="${categoryName}"></a>
+                </li>
             </ul>
             <p th:unless="${not #lists.isEmpty(client.budgetCategoryNames)}">No budgets found.</p>
         </dd>

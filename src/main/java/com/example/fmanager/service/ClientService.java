@@ -61,4 +61,12 @@ public class ClientService {
                 .orElseThrow(() -> new NotFoundException(CLIENT_NOT_FOUND_MESSAGE));
         clientRepository.delete(user);
     }
+
+    public List<Client> findAllClients() {
+        return clientRepository.findAll(); // Return the entities
+    }
+
+    public Optional<Client> findClientById(int id) {
+        return clientRepository.findById(id);  //Return Optional<Client>
+    }
 }

@@ -1,0 +1,35 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Budgets</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1>Budgets</h1>
+    <a href="/budgets/new" class="btn btn-primary">Create New Budget</a>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Category</th>
+            <th>Limitation</th>
+            <th>Period</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="budget : ${budgets}">
+            <td th:text="${budget.categoryName}"></td>
+            <td th:text="${budget.limitation}"></td>
+            <td th:text="${budget.period}"></td>
+            <td>
+                <a th:href="@{/budgets/{id}(id=${budget.id})}" class="btn btn-sm btn-info">View</a>
+                <a th:href="@{/budgets/edit/{id}(id=${budget.id})}" class="btn btn-sm btn-warning">Edit</a>
+                <a th:href="@{/budgets/delete/{id}(id=${budget.id})}" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

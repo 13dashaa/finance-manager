@@ -17,5 +17,5 @@ public class AccountCreateDto {
     @Min(value = 1, message = "Balance must be greater than zero")
     private double balance;
     @Min(1)
-    private int clientId;
+    private Integer clientId;
 }

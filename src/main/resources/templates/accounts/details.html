@@ -15,12 +15,14 @@
     <dt>Balance</dt>
     <dd th:text="${account.balance}"></dd>
     <dt>Client</dt>
-    <dd th:text="${account.clientUsername}"></dd>
+    <dd>
+      <a th:href="@{/clients/{id}(id=${account.clientId})}" th:text="${account.clientUsername}"></a>
+    </dd>
     <dt>Created At</dt>
     <dd th:text="${account.createdAt}"></dd>
     <dt>Updated At</dt>
     <dd th:text="${account.updatedAt}"></dd>
-    <dt>Transaction</dt>
+    <dt>Transaction Descriptions</dt>
     <dd>
       <ul th:if="${not #sets.isEmpty(account.transactionDescriptions)}">
         <li th:each="description : ${account.transactionDescriptions}" th:text="${description}"></li>
