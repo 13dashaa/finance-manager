@@ -3,7 +3,9 @@ package com.example.fmanager.dto;
 import com.example.fmanager.models.Budget;
 import com.example.fmanager.models.Category;
 import com.example.fmanager.models.Transaction;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.Getter;
@@ -15,7 +17,8 @@ public class CategoryGetDto {
     private int id;
     private String name;
     private Set<Integer> budgetIds = new HashSet<>();
-    private Set<Integer> transactionIds = new HashSet<>();
+    private Set<Integer> transactionIds;
+    private Set<String> transactionDescriptions;
 
     public static CategoryGetDto convertToDto(Category category) {
         CategoryGetDto dto = new CategoryGetDto();
@@ -26,13 +29,17 @@ public class CategoryGetDto {
         } else {
             dto.setBudgetIds(new HashSet<>());
         }
-        Set<Transaction> transactions = category.getTransactions();
-        if (transactions != null) {
+        if (category.getTransactions() != null) {
             dto.setTransactionIds(category.getTransactions().stream()
                     .map(Transaction::getId)
                     .collect(Collectors.toSet()));
+
+            dto.setTransactionDescriptions(category.getTransactions().stream()
+                    .map(Transaction::getDescription)
+                    .collect(Collectors.toSet()));
         } else {
             dto.setTransactionIds(new HashSet<>());
+            dto.setTransactionDescriptions(new HashSet<>());
         }
         dto.setName(category.getName());
         return dto;

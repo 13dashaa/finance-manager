@@ -3,6 +3,7 @@ package com.example.fmanager.controller;
 import com.example.fmanager.dto.CategoryCreateDto;
 import com.example.fmanager.dto.CategoryGetDto;
 import com.example.fmanager.models.Category;
+import com.example.fmanager.service.BudgetService; // Import BudgetService
 import com.example.fmanager.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,95 +12,108 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
-@RestController
+@Controller
 @RequestMapping("/categories")
 @Tag(name = "Category Management", description = "APIs for managing categories")
 public class CategoryController {
 
     private final CategoryService categoryService;
+    private final BudgetService budgetService; // Add BudgetService
 
-    public CategoryController(CategoryService categoryService) {
+    public CategoryController(CategoryService categoryService, BudgetService budgetService) { // Inject BudgetService
         this.categoryService = categoryService;
+        this.budgetService = budgetService;
+    }
+
+    @GetMapping("/new")
+    public String showCreateForm(Model model) {
+        model.addAttribute("categoryCreateDto", new CategoryCreateDto(""));
+        return "categories/create";
     }
 
     @PostMapping
-    @Operation(summary = "Create a new category",
-               description = "Creates a new category with the provided details")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Category created successfully"),
-        @ApiResponse(responseCode = "400", description = "Invalid input"),
-        @ApiResponse(responseCode = "404", description = "Category not found after creation")
-    })
-    public ResponseEntity<CategoryGetDto> createCategory(
-            @Valid @RequestBody CategoryCreateDto categoryCreateDto
+    public String createCategory(
+            @Valid @ModelAttribute("categoryCreateDto") CategoryCreateDto categoryCreateDto,
+            BindingResult bindingResult
     ) {
-        Category category = categoryService.createCategory(categoryCreateDto);
-        return categoryService
-                .findById(category.getId())
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        if (bindingResult.hasErrors()) {
+            return "categories/create";
+        }
+        categoryService.createCategory(categoryCreateDto);
+        return "redirect:/categories";
     }
 
     @GetMapping
-    @Operation(summary = "Get all categories", description = "Retrieves a list of all categories")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Categories retrieved successfully"),
-        @ApiResponse(responseCode = "400", description = "Invalid request")
-    })
-    public List<CategoryGetDto> getCategories() {
-        return categoryService.findAll();
+    public String getCategories(Model model) {
+        List<CategoryGetDto> categories = categoryService.findAll();
+        model.addAttribute("categories", categories);
+        return "categories/list";
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get category by ID")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Category found"),
-        @ApiResponse(responseCode = "404", description = "Category not found")
-    })
-    public ResponseEntity<CategoryGetDto> getCategoryById(
-            @Parameter(description = "ID of the category to retrieve", example = "1")
-            @PathVariable int id) {
+    public String getCategoryById(
+            @PathVariable int id,
+            Model model
+    ) {
         return categoryService
                 .findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(category -> {
+                    model.addAttribute("category", category);
+
+                    // Fetch budget names for display in the view
+                    model.addAttribute("budgetNames",
+                            category.getBudgetIds().stream()
+                                    .map(budgetId -> budgetService.getBudgetById(budgetId)
+                                            .map(budget -> budget.getCategoryName()) // Assuming CategoryName is the right field. Change if needed.
+                                            .orElse("Budget Not Found"))
+                                    .toList()); // Get budget names
+
+                    return "categories/details";
+                })
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found"));
     }
 
-    @DeleteMapping("/{id}")
-    @Operation(summary = "Delete category by ID")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "Category deleted successfully"),
-        @ApiResponse(responseCode = "404", description = "Category not found")
-    })
-    public void deleteCategory(
-            @Parameter(description = "ID of the category to delete", example = "1")
-            @PathVariable int id) {
+    @GetMapping("/delete/{id}")
+    public String deleteCategory(@PathVariable int id) {
         categoryService.deleteCategory(id);
+        return "redirect:/categories";
     }
 
-    @PutMapping("/{id}")
-    @Operation(summary = "Update category by ID")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Category updated successfully"),
-        @ApiResponse(responseCode = "400", description = "Invalid input"),
-        @ApiResponse(responseCode = "404", description = "Category not found")
-    })
-    public ResponseEntity<CategoryGetDto> updateCategory(
-            @Parameter(description = "ID of the category to update", example = "1")
+    @GetMapping("/edit/{id}")
+    public String showUpdateForm(@PathVariable int id, Model model) {
+        return categoryService.findById(id)
+                .map(category -> {
+                    model.addAttribute("category", category);
+                    model.addAttribute("categoryCreateDto", new CategoryCreateDto(category.getName()));
+                    return "categories/edit";
+                })
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found"));
+    }
+
+    @PostMapping("/edit/{id}")
+    public String updateCategory(
             @PathVariable int id,
-            @Parameter(description = "Updated category details")
-            @RequestBody CategoryCreateDto categoryDetails) {
-        CategoryGetDto updatedCategory = categoryService.updateCategory(id, categoryDetails);
-        return ResponseEntity.ok(updatedCategory);
+            @Valid @ModelAttribute("categoryCreateDto") CategoryCreateDto categoryDetails,
+            BindingResult bindingResult,
+            Model model) {
+        CategoryGetDto category = categoryService.findById(id).orElse(null);
+
+        if (bindingResult.hasErrors() || category == null) {
+            model.addAttribute("category", category);
+            return "categories/edit";
+        }
+        categoryService.updateCategory(id, categoryDetails);
+        return "redirect:/categories/" + id;
     }
 }

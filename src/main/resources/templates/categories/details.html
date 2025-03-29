@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Category Details</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1>Category Details</h1>
+    <dl>
+        <dt>ID</dt>
+        <dd th:text="${category.id}"></dd>
+        <dt>Name</dt>
+        <dd th:text="${category.name}"></dd>
+
+        <dt>Budgets</dt>
+        <dd>
+            <ul th:if="${not #sets.isEmpty(category.budgetIds)}">
+                <li th:each="budgetId : ${category.budgetIds}">
+                    <a th:href="@{/budgets/{id}(id=${budgetId})}" th:text="${budgetId}"></a>
+                </li>
+            </ul>
+            <p th:unless="${not #sets.isEmpty(category.budgetIds)}">No budgets found for this category.</p>
+        </dd>
+
+        <dt>Transactions</dt>
+        <dd>
+            <ul th:if="${not #sets.isEmpty(category.transactionDescriptions)}">
+                <li th:each="transactionDescription, i : ${category.transactionDescriptions}">
+                    <a th:href="@{/transactions/{id}(id=${category.transactionIds.toArray()[i.index]})}" th:text="${transactionDescription}"></a>
+                </li>
+            </ul>
+            <p th:unless="${not #sets.isEmpty(category.transactionIds)}">No transactions found for this category.</p>
+        </dd>
+    </dl>
+
+    <a th:href="@{/categories/edit/{id}(id=${category.id})}" class="btn btn-primary">Edit</a>
+    <a href="/categories" class="btn btn-secondary">Back to List</a>
+</div>
+</body>
+</html>
