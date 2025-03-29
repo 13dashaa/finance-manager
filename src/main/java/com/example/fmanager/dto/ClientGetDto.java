@@ -3,11 +3,10 @@ package com.example.fmanager.dto;
 import com.example.fmanager.models.Account;
 import com.example.fmanager.models.Budget;
 import com.example.fmanager.models.Client;
+import com.example.fmanager.models.Goal;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-import com.example.fmanager.models.Goal;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,7 +14,7 @@ import lombok.Setter;
 @Setter
 public class ClientGetDto {
 
-    private int id;
+    private Integer id;
     private String username;
     private String email;
     private Set<String> budgetCategoryNames;

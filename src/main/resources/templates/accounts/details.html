@@ -3,6 +3,7 @@
 <head>
   <title>Account Details</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
 <div class="container">
@@ -28,9 +29,85 @@
       <p th:unless="${not #sets.isEmpty(account.transactionDescriptions)}">No transactions found.</p>
     </dd>
   </dl>
-
-  <a th:href="@{/accounts/edit/{id}(id=${account.id})}" class="btn btn-primary">Edit</a>
+  <button id="editButton" class="btn btn-primary">Edit</button>
+  <button id="deleteButton" class="btn btn-danger">Delete</button>
   <a href="/accounts" class="btn btn-secondary">Back to List</a>
+
+  <div id="editForm" style="display:none;">
+    <h2>Edit Account</h2>
+    <form id="updateForm">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" class="form-control" id="name" name="name" th:value="${account.name}" required="required"/>
+      </div>
+      <div class="form-group">
+        <label for="balance">Balance</label>
+        <input type="number" step="0.01" class="form-control" id="balance" name="balance" th:value="${account.balance}" required="required"/>
+      </div>
+      <button type="button" id="updateButton" class="btn btn-primary">Update</button>
+      <button type="button" id="cancelButton" class="btn btn-secondary">Cancel</button>
+    </form>
+  </div>
 </div>
+
+<script th:inline="javascript">
+  $(document).ready(function () {
+    const accountId = [[${account.id}]];
+
+    $("#editButton").click(function () {
+      $("#editForm").show();
+    });
+
+    $("#cancelButton").click(function () {
+      $("#editForm").hide();
+    });
+
+    $("#updateButton").click(function (event) {
+      event.preventDefault();
+
+      var data = {};
+      $('#updateForm').serializeArray().map(function (x) {
+        data[x.name] = x.value;
+      });
+
+      $.ajax({
+        type: "PUT",
+        contentType: "application/json",
+        url: "/accounts/" + accountId,
+        data: JSON.stringify(data),
+        success: function (data, textStatus, xhr) {
+          if (xhr.status === 200) {
+            window.location.href = "/accounts/" + accountId;
+          } else {
+            alert("Account updated successfully, but there was an issue with redirection.");
+            window.location.href = "/accounts/" + accountId;
+          }
+        },
+        error: function (e) {
+          console.error("ERROR : ", e);
+          alert("Error updating account!");
+        }
+      });
+    });
+
+    $("#deleteButton").click(function (event) {
+      event.preventDefault();
+
+      if (confirm("Are you sure you want to delete this account?")) {
+        $.ajax({
+          type: "DELETE",
+          url: "/accounts/" + accountId,
+          success: function () {
+            window.location.href = "/accounts";
+          },
+          error: function (e) {
+            console.error("ERROR : ", e);
+            alert("Error deleting account!");
+          }
+        });
+      }
+    });
+  });
+</script>
 </body>
 </html>

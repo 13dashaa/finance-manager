@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -55,9 +57,9 @@ public class GoalController {
     @Operation(summary = "Create a new goal",
             description = "Creates a new goal with the provided details")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Goal created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
-            @ApiResponse(responseCode = "404", description = "Goal not found after creation")
+        @ApiResponse(responseCode = "200", description = "Goal created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input"),
+        @ApiResponse(responseCode = "404", description = "Goal not found after creation")
     })
     public String createGoal(
             @Valid @ModelAttribute("goalCreateDto") GoalCreateDto goalCreateDto,
@@ -72,8 +74,8 @@ public class GoalController {
     @GetMapping
     @Operation(summary = "Get all goals", description = "Retrieves a list of all goals")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Goals retrieved successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request")
+        @ApiResponse(responseCode = "200", description = "Goals retrieved successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid request")
     })
     public String getGoals(Model model) {
         List<GoalGetDto> goals = goalService.getAllGoals();
@@ -84,8 +86,8 @@ public class GoalController {
     @GetMapping("/{id}")
     @Operation(summary = "Get goal by ID", description = "Retrieves a goal by its unique ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Goal found"),
-            @ApiResponse(responseCode = "404", description = "Goal not found")
+        @ApiResponse(responseCode = "200", description = "Goal found"),
+        @ApiResponse(responseCode = "404", description = "Goal not found")
     })
     public String getGoalById(
             @Parameter(description = "ID of the goal to retrieve", example = "1")
@@ -94,17 +96,28 @@ public class GoalController {
         return goalService.getGoalById(id)
                 .map(goal -> {
                     model.addAttribute("goal", goal);
+                    GoalCreateDto goalUpdateDto = new GoalCreateDto(
+                            goal.getName(),
+                            goal.getTargetAmount(),
+                            goal.getCurrentAmount(),
+                            goal.getStartDate(),
+                            goal.getEndDate(),
+                            goal.getClientId()
+                    );
+                    model.addAttribute("goalUpdateDto", goalUpdateDto);
                     return "goals/details";
                 })
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Goal not found"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Goal not found"
+                ));
     }
 
     @GetMapping("/filter")
     @Operation(summary = "Get goals by client ID",
             description = "Retrieves goals associated with a specific client ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Goals retrieved successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid client ID")
+        @ApiResponse(responseCode = "200", description = "Goals retrieved successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid client ID")
     })
     public String getGoalsByClient(
             @Parameter(description = "Client ID to filter goals", example = "1")
@@ -115,52 +128,71 @@ public class GoalController {
         return "goals/list";
     }
 
-    @GetMapping("/delete/{id}")
-    @Operation(summary = "Delete goal by ID", description = "Deletes a goal by its unique ID")
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete Goal by ID (API)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Goal deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Goal not found")
+        @ApiResponse(responseCode = "204", description = "Goal deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "Goal not found")
     })
-    public String deleteGoal(
+    @ResponseBody
+    public ResponseEntity<?> deleteGoalApi(
             @Parameter(description = "ID of the goal to delete", example = "1")
-            @PathVariable int id) {
-        goalService.deleteGoal(id);
-        return "redirect:/goals";
+            @PathVariable int id
+    ) {
+        try {
+            goalService.deleteGoal(id);
+            return ResponseEntity.noContent().build();
+        } catch (ResponseStatusException rse) {
+            if (rse.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return new ResponseEntity<>(
+                        "Goal not found with id: " + id, HttpStatus.NOT_FOUND
+                );
+            }
+            throw rse;
+        } catch (Exception e) {
+            return new ResponseEntity<>(
+                    "An internal error occurred.", HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
-    @GetMapping("/edit/{id}")
-    public String showUpdateForm(@PathVariable int id, Model model) {
-        return goalService.getGoalById(id)
-                .map(goal -> {
-                    model.addAttribute("goal", goal);
-                    GoalCreateDto goalCreateDto = new GoalCreateDto(goal.getName(), goal.getTargetAmount(), goal.getStartDate(), goal.getEndDate(), goal.getClientId());
-                    model.addAttribute("goalCreateDto", goalCreateDto);
-                    return "goals/edit";
-                })
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Goal not found"));
-    }
-
-    @PostMapping("/edit/{id}")
-    @Operation(summary = "Update goal by ID",
-            description = "Updates an existing goal with the provided details")
+    @PutMapping("/{id}")
+    @Operation(summary = "Update goal by ID (API)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Goal updated successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
-            @ApiResponse(responseCode = "404", description = "Goal not found")
+        @ApiResponse(responseCode = "200", description = "Goal updated successfully"),
+        @ApiResponse(responseCode = "404", description = "Goal not found"),
+        @ApiResponse(responseCode = "400", description = "Invalid input")
     })
-    public String updateGoal(
+    @ResponseBody // Важно
+    public ResponseEntity<?> updateGoalApi(
             @Parameter(description = "ID of the goal to update", example = "1")
             @PathVariable int id,
-            @Valid @ModelAttribute("goalCreateDto") GoalCreateDto goalDetails,
-            BindingResult bindingResult,
-            Model model) {
-        GoalGetDto goal = goalService.getGoalById(id).orElse(null);
-
-        if (bindingResult.hasErrors() || goal == null) {
-            model.addAttribute("goal", goal);
-            return "goals/edit";
+            @Valid @RequestBody GoalCreateDto goalUpdateDto,
+            BindingResult bindingResult
+    ) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>(
+                    "Validation errors: " + bindingResult.getAllErrors(), HttpStatus.BAD_REQUEST
+            );
         }
-        goalService.updateGoal(id, goalDetails);
-        return "redirect:/goals/" + id;
+        if (goalUpdateDto.getStartDate() != null && goalUpdateDto.getEndDate() != null
+                && goalUpdateDto.getStartDate().isAfter(goalUpdateDto.getEndDate())) {
+            return new ResponseEntity<>(
+                    "Validation error: Start date cannot be after end date.", HttpStatus.BAD_REQUEST
+            );
+        }
+        try {
+            goalService.updateGoal(id, goalUpdateDto);
+            return ResponseEntity.ok().body("{}");
+        } catch (ResponseStatusException rse) {
+            if (rse.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return new ResponseEntity<>("Goal not found with id: " + id, HttpStatus.NOT_FOUND);
+            }
+            throw rse;
+        } catch (Exception e) {
+            return new ResponseEntity<>(
+                    "An internal error occurred.", HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
     }
 }

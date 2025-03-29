@@ -1,19 +1,24 @@
 package com.example.fmanager.dto;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
-import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.validation.annotation.Validated;
+import lombok.Setter;
 
-@AllArgsConstructor
-@NoArgsConstructor //
-@Validated
+@Getter
+@Setter
+@NoArgsConstructor
 public class BulkCreateDto<T> {
-
     @Valid
-    private List<T> items;
+    @Size(min = 1)
+    private List<T> items = new ArrayList<>();  // Initialize the list
+
+    public BulkCreateDto(List<T> items) {
+        this.items = items;
+    }
 
     public List<T> getItems() {
         return items;

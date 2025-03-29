@@ -1,4 +1,5 @@
 package com.example.fmanager.controller;
+
 import com.example.fmanager.dto.BulkCreateDto;
 import com.example.fmanager.dto.ClientCreateDto;
 import com.example.fmanager.dto.ClientGetDto;
@@ -10,14 +11,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller; // Изменено: использовать @Controller вместо @RestController
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,9 +28,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.server.ResponseStatusException;
 
-@Controller // Изменено: использовать @Controller вместо @RestController
+@Controller
 @RequestMapping("/clients")
 @Tag(name = "Client Management", description = "APIs for managing clients")
 public class ClientController {
@@ -52,9 +52,9 @@ public class ClientController {
     @Operation(summary = "Create a new client",
             description = "Creates a new client with the provided details")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Client created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
-            @ApiResponse(responseCode = "404", description = "Client not found after creation")
+        @ApiResponse(responseCode = "200", description = "Client created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input"),
+        @ApiResponse(responseCode = "404", description = "Client not found after creation")
     })
     public String createUser(
             @Valid @ModelAttribute("clientCreateDto") ClientCreateDto clientCreateDto,
@@ -71,8 +71,8 @@ public class ClientController {
     @GetMapping
     @Operation(summary = "Get all clients", description = "Retrieves a list of all clients")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Clients retrieved successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request")
+        @ApiResponse(responseCode = "200", description = "Clients retrieved successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid request")
     })
     public String getClients(Model model) {
         List<ClientGetDto> clients = clientService.findAll();
@@ -83,32 +83,54 @@ public class ClientController {
     @GetMapping("/{id}")
     @Operation(summary = "Get client by ID", description = "Retrieves a client by its unique ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Client found"),
-            @ApiResponse(responseCode = "404", description = "Client not found")
+        @ApiResponse(responseCode = "200", description = "Client found"),
+        @ApiResponse(responseCode = "404", description = "Client not found")
     })
     public String getClientById(
-            @Parameter(description = "ID of the client to retrieve", example = "1") @PathVariable int id,
+            @Parameter(description = "ID of the client to retrieve", example = "1")
+            @PathVariable int id,
             Model model) {
         return clientService.findById(id)
                 .map(
                         client -> {
                             model.addAttribute("client", client);
-                            model.addAttribute("clientUpdateDto", new ClientUpdateDto(client.getUsername()));
+                            model.addAttribute(
+                                    "clientUpdateDto",
+                                    new ClientUpdateDto(client.getUsername())
+                            );
                             return "clients/details";
                         })
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Client not found"
+                ));
     }
 
-    @GetMapping("/delete/{id}")
-    @Operation(summary = "Delete client by ID", description = "Deletes a client by its unique ID")
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete Client by ID (API)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Client deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Client not found")
+        @ApiResponse(responseCode = "204", description = "Client deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "Client not found")
     })
-    public String deleteClient(
-            @Parameter(description = "ID of the client to delete", example = "1") @PathVariable int id) {
-        clientService.deleteUser(id);
-        return "redirect:/clients";
+    @ResponseBody
+    public ResponseEntity<?> deleteClientApi(
+            @Parameter(description = "ID of the client to delete", example = "1")
+            @PathVariable int id
+    ) {
+        try {
+            clientService.deleteUser(id);
+            return ResponseEntity.noContent().build();
+        } catch (ResponseStatusException rse) {
+            if (rse.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return new ResponseEntity<>(
+                        "Client not found with id: " + id, HttpStatus.NOT_FOUND
+                );
+            }
+            throw rse;
+        } catch (Exception e) {
+            return new ResponseEntity<>(
+                    "An internal error occurred.", HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
     @GetMapping("/bulk")
@@ -137,35 +159,39 @@ public class ClientController {
         return "redirect:/clients";
     }
 
-    @GetMapping("/edit/{id}")
-    public String showUpdateForm(@PathVariable int id, Model model) {
-        return clientService.findById(id)
-                .map(
-                        client -> {
-                            model.addAttribute("client", client);
-                            model.addAttribute("clientUpdateDto", new ClientUpdateDto(client.getUsername()));
-                            return "clients/edit";
-                        })
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found"));
-    }
-
-    @PostMapping("/edit/{id}")
-    @Operation(summary = "Update client by ID",
-            description = "Updates an existing client with the provided details")
+    @PutMapping("/{id}")
+    @Operation(summary = "Update client by ID (API)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Client updated successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
-            @ApiResponse(responseCode = "404", description = "Client not found")
+        @ApiResponse(responseCode = "200", description = "Client updated successfully"),
+        @ApiResponse(responseCode = "404", description = "Client not found"),
+        @ApiResponse(responseCode = "400", description = "Invalid input")
     })
-    public String updateClient(
-            @Parameter(description = "ID of the client to update", example = "1") @PathVariable int id,
-            @Valid @ModelAttribute("clientUpdateDto") ClientUpdateDto clientUpdateDto,
-            BindingResult bindingResult, Model model) {
+    @ResponseBody
+    public ResponseEntity<?> updateClientApi(
+            @Parameter(description = "ID of the client to update", example = "1")
+            @PathVariable int id,
+            @Valid @RequestBody ClientUpdateDto clientUpdateDto,
+            BindingResult bindingResult
+    ) {
         if (bindingResult.hasErrors()) {
-            return "clients/edit";
+            return new ResponseEntity<>(
+                    "Validation errors: " + bindingResult.getAllErrors(), HttpStatus.BAD_REQUEST
+            );
         }
-
-        clientService.updateUser(id, clientUpdateDto);
-        return "redirect:/clients/" + id;
+        try {
+            clientService.updateUser(id, clientUpdateDto);
+            return ResponseEntity.ok().body("{}");
+        } catch (ResponseStatusException rse) {
+            if (rse.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return new ResponseEntity<>(
+                        "Client not found with id: " + id, HttpStatus.NOT_FOUND
+                );
+            }
+            throw rse;
+        } catch (Exception e) {
+            return new ResponseEntity<>(
+                    "An internal error occurred.", HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
     }
 }

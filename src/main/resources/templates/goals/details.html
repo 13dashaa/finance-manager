@@ -1,32 +1,161 @@
-
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Goal Details</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        #editForm { margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        dl dt { font-weight: bold; margin-top: 5px;}
+    </style>
 </head>
 <body>
-<div class="container">
+<div class="container mt-4">
     <h1>Goal Details</h1>
     <dl>
         <dt>Name</dt>
-        <dd th:text="${goal.name}"></dd>
+        <dd th:text="${goal.name}">Goal Name</dd>
         <dt>Target Amount</dt>
-        <dd th:text="${goal.targetAmount}"></dd>
+        <dd th:text="${goal.targetAmount != null ? #numbers.formatDecimal(goal.targetAmount, 1, 'COMMA', 2, 'POINT') : 'N/A'}">1000.00</dd>
         <dt>Current Amount</dt>
-        <dd th:text="${goal.currentAmount}"></dd>
+        <dd th:text="${goal.currentAmount != null ? #numbers.formatDecimal(goal.currentAmount, 1, 'COMMA', 2, 'POINT') : 'N/A'}">500.00</dd>
         <dt>Start Date</dt>
-        <dd th:text="${goal.startDate}"></dd>
+        <dd th:text="${goal.startDate != null ? #temporals.format(goal.startDate, 'yyyy-MM-dd') : 'N/A'}">2024-01-01</dd>
         <dt>End Date</dt>
-        <dd th:text="${goal.endDate}"></dd>
+        <dd th:text="${goal.endDate != null ? #temporals.format(goal.endDate, 'yyyy-MM-dd') : 'N/A'}">2024-12-31</dd>
         <dt>Client</dt>
         <dd>
-            <a th:href="@{/clients/{id}(id=${goal.clientId})}" th:text="${goal.clientUsername}"></a>
+            <a th:if="${goal.clientId != null}" th:href="@{/clients/{id}(id=${goal.clientId})}" th:text="${goal.clientUsername ?: 'Unknown Client'}">Client Username</a>
+            <span th:unless="${goal.clientId != null}">N/A</span>
         </dd>
     </dl>
 
-    <a th:href="@{/goals/edit/{id}(id=${goal.id})}" class="btn btn-primary">Edit</a>
+    <button id="editButton" class="btn btn-primary">Edit</button>
+    <button id="deleteButton" class="btn btn-danger">Delete</button>
     <a href="/goals" class="btn btn-secondary">Back to List</a>
+    <div id="editForm" style="display:none;">
+        <h2>Edit Goal</h2>
+        <form id="updateForm" th:object="${goalUpdateDto}">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" class="form-control" id="name" th:field="*{name}" required="required"/>
+                <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="targetAmount">Target Amount</label>
+                <input type="number" step="any" class="form-control" id="targetAmount" th:field="*{targetAmount}" required="required"/>
+                <span th:if="${#fields.hasErrors('targetAmount')}" th:errors="*{targetAmount}" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="currentAmount">Current Amount</label>
+                <input type="number" step="any" class="form-control" id="currentAmount" th:field="*{currentAmount}" required="required"/>
+                <span th:if="${#fields.hasErrors('currentAmount')}" th:errors="*{currentAmount}" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="startDate">Start Date</label>
+                <input type="date" class="form-control" id="startDate" th:field="*{startDate}" required="required"/>
+                <span th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="endDate">End Date</label>
+                <input type="date" class="form-control" id="endDate" th:field="*{endDate}" required="required"/>
+                <span th:if="${#fields.hasErrors('endDate')}" th:errors="*{endDate}" class="text-danger"></span>
+            </div>
+            <button type="button" id="updateButton" class="btn btn-success">Update Goal</button>
+            <button type="button" id="cancelButton" class="btn btn-secondary">Cancel</button>
+        </form>
+    </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    $(document).ready(function () {
+        const goalId = /*[[${goal != null ? goal.id : null}]]*/ null;
+        if (!goalId) {
+            console.error("Goal ID not found in the model!");
+            $("#editButton, #deleteButton").prop("disabled", true).addClass("disabled");
+        }
+        $("#editButton").click(function () {
+            $("#editForm").slideDown();
+            $(this).hide();
+        });
+        $("#cancelButton").click(function () {
+            $("#editForm").slideUp();
+            $("#editButton").show();
+        });
+
+        $("#updateButton").click(function (event) {
+            event.preventDefault();
+            if (!goalId) return;
+
+            var goalData = {
+                name: $("#name").val(),
+                targetAmount: $("#targetAmount").val() ? parseFloat($("#targetAmount").val()) : null,
+                currentAmount: $("#currentAmount").val() ? parseFloat($("#currentAmount").val()) : null, // <-- Добавлено
+                startDate: $("#startDate").val() || null,
+                endDate: $("#endDate").val() || null
+            };
+            if (!goalData.name || goalData.name.trim() === '' ||
+                goalData.targetAmount === null || goalData.targetAmount <= 0 ||
+                goalData.currentAmount === null || goalData.currentAmount < 0 || // <-- Добавлена проверка
+                !goalData.startDate || !goalData.endDate) {
+                alert("Please fill in all fields correctly and ensure amounts are valid.");
+                return;
+            }
+            if (goalData.startDate > goalData.endDate) {
+                alert("Start date cannot be after end date.");
+                return;
+            }
+            if (goalData.currentAmount > goalData.targetAmount) {
+                alert("Current amount cannot exceed target amount.");
+                return;
+            }
+            console.log("Sending data:", JSON.stringify(goalData));
+            $.ajax({
+                type: "PUT",
+                contentType: "application/json",
+                url: "/goals/" + goalId,
+                data: JSON.stringify(goalData),
+                dataType: 'json',
+                success: function (data, textStatus, xhr) {
+                    console.log("Update successful:", xhr.status);
+                    window.location.reload();
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.error("ERROR updating goal: ", xhr.status, errorThrown, xhr.responseText);
+                    alert("Error updating goal! Status: " + xhr.status + "\n" + (xhr.responseText || errorThrown));
+                }
+            });
+        });
+
+        // Delete (без изменений)
+        $("#deleteButton").click(function (event) {
+            event.preventDefault();
+            if (!goalId) return;
+            if (confirm("Are you sure you want to delete this goal?")) {
+                $.ajax({
+                    type: "DELETE",
+                    url: "/goals/" + goalId,
+                    success: function (data, textStatus, xhr) {
+                        if (xhr.status === 204) {
+                            console.log("Delete successful");
+                            window.location.href = "/goals";
+                        } else {
+                            alert("Goal deleted, but received an unexpected response status: " + xhr.status);
+                            window.location.href = "/goals";
+                        }
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        console.error("ERROR deleting goal: ", xhr.status, errorThrown, xhr.responseText);
+                        alert("Error deleting goal! Status: " + xhr.status + "\n" + (xhr.responseText || errorThrown));
+                    }
+                });
+            }
+        });
+    });
+    /*]]>*/
+</script>
+
 </body>
 </html>

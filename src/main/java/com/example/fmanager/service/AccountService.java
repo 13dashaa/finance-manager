@@ -15,7 +15,6 @@ import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -66,16 +65,19 @@ public class AccountService {
         cache.put(cacheKey, accountGetDtos);
         return accountGetDtos;
     }
+
     public List<AccountGetDto> findByClientUsername(String clientUsername) {
         return accountRepository.findByClientUsername(clientUsername).stream()
                 .map(AccountGetDto::convertToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
+
     public void clearCacheForClient(int clientId) {
         String cacheKey = "accounts_client_" + clientId;
         cache.remove(cacheKey);
     }
 
+    @Transactional
     public Account createAccount(AccountCreateDto accountCreateDto) {
         Client client = clientRepository.findById(accountCreateDto.getClientId())
                 .orElseThrow(() -> new RuntimeException("Client not found"));

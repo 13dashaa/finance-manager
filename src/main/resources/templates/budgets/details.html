@@ -3,38 +3,166 @@
 <head>
     <title>Budget Details</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        #editForm { margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        dl dt { font-weight: bold; margin-top: 5px;}
+        .form-check { margin-bottom: 5px; }
+    </style>
 </head>
 <body>
-<div class="container">
+<div class="container mt-4">
+
     <h1>Budget Details</h1>
     <dl>
-        <dt>ID</dt>
-        <dd th:text="${budget.id}"></dd>
         <dt>Category</dt>
         <dd>
-            <a th:href="@{/categories/{id}(id=${budget.categoryId})}" th:text="${budget.categoryName}"></a>
+            <a th:if="${budget.categoryId != null}" th:href="@{/categories/{id}(id=${budget.categoryId})}" th:text="${budget.categoryName ?: 'Unknown Category'}">Category Name</a>
+            <span th:unless="${budget.categoryId != null}" th:text="${budget.categoryName ?: 'N/A'}">N/A</span>
         </dd>
         <dt>Limitation</dt>
-        <dd th:text="${budget.limitation}"></dd>
+        <dd th:text="${#numbers.formatDecimal(budget.limitation, 1, 'COMMA', 2, 'POINT')} ?: 'N/A'">1000.00</dd>
         <dt>Period</dt>
-        <dd th:text="${budget.period}"></dd>
+        <dd th:text="${budget.period}">Monthly</dd>
         <dt>Created At</dt>
-        <dd th:text="${budget.createdAt}"></dd>
+        <dd th:text="${budget.createdAt != null ? #temporals.format(budget.createdAt, 'yyyy-MM-dd HH:mm:ss') : 'N/A'}">2024-01-01 10:00:00</dd>
         <dt>Updated At</dt>
-        <dd th:text="${budget.updatedAt}"></dd>
+        <dd th:text="${budget.updatedAt != null ? #temporals.format(budget.updatedAt, 'yyyy-MM-dd HH:mm:ss') : 'N/A'}">2024-01-15 11:30:00</dd>
         <dt>Clients</dt>
         <dd>
-            <ul th:if="${not #sets.isEmpty(budget.clientUsernames)}">
+            <ul th:if="${budget.clientUsernames != null and not #sets.isEmpty(budget.clientUsernames)}">
                 <li th:each="clientUsername, i : ${budget.clientUsernames}" >
-                    <a th:href="@{/clients/{id}(id=${budget.clientIds.toArray()[i.index]})}" th:text="${clientUsername}"></a>
+                    <a th:if="${budget.clientIds != null and budget.clientIds.size() > i.index}"
+                       th:href="@{/clients/{id}(id=${budget.clientIds.toArray()[i.index]})}"
+                       th:text="${clientUsername}">
+                        Client Username
+                    </a>
+                    <span th:unless="${budget.clientIds != null and budget.clientIds.size() > i.index}"
+                          th:text="${clientUsername} + ' (ID not found)'">
+                           Client Username (ID not found)
+                     </span>
                 </li>
             </ul>
-            <p th:unless="${not #sets.isEmpty(budget.clientUsernames)}">No clients found.</p>
+            <p th:unless="${budget.clientUsernames != null and not #sets.isEmpty(budget.clientUsernames)}">No clients found.</p>
         </dd>
     </dl>
-
-    <a th:href="@{/budgets/edit/{id}(id=${budget.id})}" class="btn btn-primary">Edit</a>
+    <button id="editButton" class="btn btn-primary">Edit</button>
+    <button id="deleteButton" class="btn btn-danger">Delete</button>
     <a href="/budgets" class="btn btn-secondary">Back to List</a>
+    <div id="editForm" style="display:none;">
+        <h2>Edit Budget</h2>
+        <form id="updateForm" th:object="${budgetUpdateDto}">
+            <div class="form-group">
+                <label for="period">Period</label>
+                <input type="text" class="form-control" id="period" th:field="*{period}" required="required"/>
+                <span th:if="${#fields.hasErrors('period')}" th:errors="*{period}" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="limitation">Limitation</label>
+                <input type="number" step="any" class="form-control" id="limitation" th:field="*{limitation}" required="required"/>
+                <span th:if="${#fields.hasErrors('limitation')}" th:errors="*{limitation}" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>Associated Clients:</label>
+                <th:block th:each="client : ${clients}">
+                    <div class="form-check">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               name="clientIds"
+                               th:value="${client.id}"
+                               th:id="'client-' + ${client.id}"
+                               th:checked="${#sets.contains(budgetUpdateDto.clientIds, client.id)}" />
+                        <label class="form-check-label" th:for="'client-' + ${client.id}" th:text="${client.username}">
+                            Client Username
+                        </label>
+                    </div>
+                </th:block>
+                <span th:if="${#fields.hasErrors('clientIds')}" th:errors="*{clientIds}" class="text-danger d-block mt-2"></span>
+            </div>
+            <button type="button" id="updateButton" class="btn btn-success">Update Budget</button>
+            <button type="button" id="cancelButton" class="btn btn-secondary">Cancel</button>
+        </form>
+    </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script th:inline="javascript">
+    $(document).ready(function () {
+        const budgetId = /*[[${budget != null ? budget.id : null}]]*/ null;
+        null;
+        if (!budgetId) {
+            console.error("Budget ID not found in the model!");
+            $("#editButton, #deleteButton").prop("disabled", true).addClass("disabled");
+        }
+        $("#editButton").click(function () {
+            $("#editForm").slideDown();
+            $(this).hide();
+        });
+        $("#cancelButton").click(function () {
+            $("#editForm").slideUp();
+            $("#editButton").show();
+        });
+
+        $("#updateButton").click(function (event) {
+            event.preventDefault();
+            if (!budgetId) return;
+
+            var selectedClientIds = $('input[name="clientIds"]:checked').map(function() {
+                return parseInt($(this).val());
+            }).get();
+            var budgetData = {
+                period: $("#period").val(),
+                limitation: $("#limitation").val() ? parseFloat($("#limitation").val()) : null,
+                clientIds: selectedClientIds
+            };
+
+            if (!budgetData.period || budgetData.limitation === null || budgetData.limitation <= 0) {
+                alert("Please fill in all fields correctly.");
+                return;
+            }
+
+            console.log("Sending data:", JSON.stringify(budgetData));
+            $.ajax({
+                type: "PUT",
+                contentType: "application/json",
+                url: "/budgets/" + budgetId,
+                data: JSON.stringify(budgetData),
+                dataType: 'json',
+                success: function (data, textStatus, xhr) {
+                    console.log("Update successful:", xhr.status);
+                    window.location.reload();
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.error("ERROR updating budget: ", xhr.status, errorThrown, xhr.responseText);
+                    alert("Error updating budget! Status: " + xhr.status + "\n" + (xhr.responseText || errorThrown));
+                }
+            });
+        });
+
+        $("#deleteButton").click(function (event) {
+            event.preventDefault();
+            if (!budgetId) return;
+            if (confirm("Are you sure you want to delete this budget? This action cannot be undone.")) {
+                $.ajax({
+                    type: "DELETE",
+                    url: "/budgets/" + budgetId,
+                    success: function (data, textStatus, xhr) {
+                        if (xhr.status === 204) {
+                            console.log("Delete successful");
+                            window.location.href = "/budgets";
+                        } else {
+                            alert("Budget deleted, but received an unexpected response status: " + xhr.status);
+                            window.location.href = "/budgets";
+                        }
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        console.error("ERROR deleting budget: ", xhr.status, errorThrown, xhr.responseText);
+                        alert("Error deleting budget! Status: " + xhr.status + "\n" + (xhr.responseText || errorThrown));
+                    }
+                });
+            }
+        });
+    });
+
+</script>
 </body>
 </html>

@@ -24,8 +24,6 @@
             <td th:text="${budget.period}"></td>
             <td>
                 <a th:href="@{/budgets/{id}(id=${budget.id})}" class="btn btn-sm btn-info">View</a>
-                <a th:href="@{/budgets/edit/{id}(id=${budget.id})}" class="btn btn-sm btn-warning">Edit</a>
-                <a th:href="@{/budgets/delete/{id}(id=${budget.id})}" class="btn btn-sm btn-danger">Delete</a>
             </td>
         </tr>
         </tbody>

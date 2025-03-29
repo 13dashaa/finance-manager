@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -28,7 +29,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.server.ResponseStatusException;
 
 @Controller
@@ -40,7 +41,11 @@ public class TransactionController {
     private final CategoryService categoryService;
     private final AccountService accountService;
 
-    public TransactionController(TransactionService transactionService, CategoryService categoryService, AccountService accountService) {
+    public TransactionController(
+            TransactionService transactionService,
+            CategoryService categoryService,
+            AccountService accountService
+    ) {
         this.transactionService = transactionService;
         this.categoryService = categoryService;
         this.accountService = accountService;
@@ -48,7 +53,8 @@ public class TransactionController {
 
     @GetMapping("/new")
     public String showCreateForm(Model model) {
-        model.addAttribute("transactionCreateDto", new TransactionCreateDto("", 0.0, LocalDateTime.now(), 0, 0));
+        model.addAttribute("transactionCreateDto",
+                new TransactionCreateDto("", 0.0, LocalDateTime.now(), 0, 0));
         List<Category> categories = categoryService.getAllCategories();
         model.addAttribute("categories", categories);
         List<Account> accounts = accountService.getAllAccounts();
@@ -59,12 +65,13 @@ public class TransactionController {
     @PostMapping
     @Operation(summary = "Create a new transaction")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Transaction created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
-            @ApiResponse(responseCode = "404", description = "Transaction not found after creation")
+        @ApiResponse(responseCode = "200", description = "Transaction created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input"),
+        @ApiResponse(responseCode = "404", description = "Transaction not found after creation")
     })
     public String createTransaction(
-            @Valid @ModelAttribute("transactionCreateDto") TransactionCreateDto transactionCreateDto,
+            @Valid
+            @ModelAttribute("transactionCreateDto") TransactionCreateDto transactionCreateDto,
             BindingResult bindingResult,
             Model model
     ) {
@@ -82,8 +89,8 @@ public class TransactionController {
     @GetMapping
     @Operation(summary = "Get all transactions")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Transactions retrieved successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request parameters")
+        @ApiResponse(responseCode = "200", description = "Transactions retrieved successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid request parameters")
     })
     public String getTransactions(Model model) {
         List<TransactionGetDto> transactions = transactionService.getAllTransactions();
@@ -94,8 +101,8 @@ public class TransactionController {
     @GetMapping("/{id}")
     @Operation(summary = "Get transaction by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Transaction found"),
-            @ApiResponse(responseCode = "404", description = "Transaction not found")
+        @ApiResponse(responseCode = "200", description = "Transaction found"),
+        @ApiResponse(responseCode = "404", description = "Transaction not found")
     })
     public String getTransaction(
             @Parameter(description = "ID of the transaction to retrieve", example = "1")
@@ -105,17 +112,32 @@ public class TransactionController {
         return transactionService.getTransactionById(id)
                 .map(transaction -> {
                     model.addAttribute("transaction", transaction);
+                    List<Category> categories = categoryService.getAllCategories();
+                    model.addAttribute("categories", categories);
+                    List<Account> accounts = accountService.getAllAccounts();
+                    model.addAttribute("accounts", accounts);
+
+                    TransactionCreateDto transactionUpdateDto = new TransactionCreateDto(
+                            transaction.getDescription(),
+                            transaction.getAmount(),
+                            transaction.getDate(),
+                            transaction.getCategoryId(),
+                            transaction.getAccountId()
+                    );
+                    model.addAttribute("transactionUpdateDto", transactionUpdateDto);
                     return "transactions/details";
                 })
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Transaction not found"
+                ));
     }
 
     @GetMapping("/filter")
     @Operation(summary = "Get transactions by client and category",
             description = "Retrieves transactions associated with a specific client and category")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Transactions retrieved successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid client ID or category ID")
+        @ApiResponse(responseCode = "200", description = "Transactions retrieved successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid client ID or category ID")
     })
     public String getTransactionsByClientAndCategory(
             @Parameter(description = "ID of the client to filter transactions", example = "1")
@@ -124,65 +146,76 @@ public class TransactionController {
             @RequestParam int categoryId,
             Model model
     ) {
-        List<TransactionGetDto> transactions = transactionService.findByClientIdAndCategoryId(clientId, categoryId);
+        List<TransactionGetDto> transactions = transactionService
+                .findByClientIdAndCategoryId(clientId, categoryId);
         model.addAttribute("transactions", transactions);
         return "transactions/list";
     }
 
-    @GetMapping("/edit/{id}")
-    public String showUpdateForm(@PathVariable int id, Model model) {
-        return transactionService.getTransactionById(id)
-                .map(transaction -> {
-                    model.addAttribute("transaction", transaction);
-                    TransactionCreateDto transactionCreateDto = new TransactionCreateDto(transaction.getDescription(), transaction.getAmount(), transaction.getDate(), transaction.getCategoryId(), transaction.getAccountId());
-                    model.addAttribute("transactionCreateDto", transactionCreateDto);
-                    List<Category> categories = categoryService.getAllCategories();
-                    model.addAttribute("categories", categories);
-                    List<Account> accounts = accountService.getAllAccounts();
-                    model.addAttribute("accounts", accounts);
-                    return "transactions/edit";
-                })
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
-    }
-
-    @PostMapping("/edit/{id}")
-    @Operation(summary = "Update transaction by ID",
-            description = "Updates an existing transaction with the provided details")
+    @PutMapping("/{id}")
+    @Operation(summary = "Update transaction by ID (API)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Transaction updated successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
-            @ApiResponse(responseCode = "404", description = "Transaction not found")
+        @ApiResponse(responseCode = "200", description = "Transaction updated successfully"),
+        @ApiResponse(responseCode = "404", description = "Transaction not found"),
+        @ApiResponse(responseCode = "400", description = "Invalid input")
     })
-    public String updateTransaction(
+    @ResponseBody // Важно
+    public ResponseEntity updateTransactionApi(
             @Parameter(description = "ID of the transaction to update", example = "1")
             @PathVariable int id,
-            @Valid @ModelAttribute("transactionCreateDto") TransactionCreateDto transactionDetails,
-            BindingResult bindingResult,
-            Model model
+            @Valid @RequestBody TransactionCreateDto transactionUpdateDto,
+            BindingResult bindingResult
     ) {
-        TransactionGetDto transaction = transactionService.getTransactionById(id).orElse(null);
-        if (bindingResult.hasErrors() || transaction == null) {
-            List<Category> categories = categoryService.getAllCategories();
-            model.addAttribute("categories", categories);
-            List<Account> accounts = accountService.getAllAccounts();
-            model.addAttribute("accounts", accounts);
-            model.addAttribute("transaction", transaction);
-            return "transactions/edit";
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>(
+                    "Validation errors: " + bindingResult.getAllErrors(), HttpStatus.BAD_REQUEST
+            );
         }
-        transactionService.updateTransaction(id, transactionDetails);
-        return "redirect:/transactions/" + id;
+        try {
+            transactionService.updateTransaction(id, transactionUpdateDto);
+            return ResponseEntity.ok().body("{}");
+        } catch (ResponseStatusException rse) {
+            if (rse.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return new ResponseEntity<>(
+                        "Transaction not found with id: " + id, HttpStatus.NOT_FOUND
+                );
+            }
+            if (rse.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                return new ResponseEntity<>(rse.getReason(), HttpStatus.BAD_REQUEST);
+            }
+            throw rse;
+        } catch (Exception e) {
+            return new ResponseEntity<>(
+                    "An internal error occurred.", HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
-    @GetMapping("/delete/{id}")
-    @Operation(summary = "Delete transaction by ID")
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete Transaction by ID (API)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Transaction deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Transaction not found")
+        @ApiResponse(responseCode = "204", description = "Transaction deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "Transaction not found")
     })
-    public String deleteTransaction(
+    @ResponseBody
+    public ResponseEntity deleteTransactionApi(
             @Parameter(description = "ID of the transaction to delete", example = "1")
-            @PathVariable int id) {
-        transactionService.deleteTransaction(id);
-        return "redirect:/transactions";
+            @PathVariable int id
+    ) {
+        try {
+            transactionService.deleteTransaction(id);
+            return ResponseEntity.noContent().build();
+        } catch (ResponseStatusException rse) {
+            if (rse.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return new ResponseEntity<>(
+                        "Transaction not found with id: " + id, HttpStatus.NOT_FOUND
+                );
+            }
+            throw rse;
+        } catch (Exception e) {
+            return new ResponseEntity<>(
+                    "An internal error occurred.", HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
     }
 }

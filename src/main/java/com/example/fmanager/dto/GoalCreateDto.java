@@ -16,6 +16,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class GoalCreateDto {
     @NotBlank(message = "Name cannot be null")
     @Size(min = 1, max = 100, message = "Name must be between 1 and 100 characters")
@@ -23,6 +24,7 @@ public class GoalCreateDto {
     @NotNull(message = "Target amount cannot be null")
     @Positive(message = "Target amount must be positive")
     private BigDecimal targetAmount;
+    private BigDecimal currentAmount;
     private LocalDate startDate;
     @NotNull(message = "End date cannot be null")
     @Future(message = "End date must be in the future")
@@ -30,7 +32,11 @@ public class GoalCreateDto {
     @Min(value = 1, message = "Only one client ID must be provided")
     private Integer clientId;
 
-    public GoalCreateDto(String name, BigDecimal targetAmount, LocalDate startDate, LocalDate endDate, int clientId) {
+    public GoalCreateDto(String name,
+                         BigDecimal targetAmount,
+                         LocalDate startDate,
+                         LocalDate endDate,
+                         int clientId) {
         this.name = name;
         this.targetAmount = targetAmount;
         this.startDate = startDate;

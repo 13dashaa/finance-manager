@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @Getter
 public class GoalGetDto {
-    private int id;
+    private Integer id;
     private String name;
     private BigDecimal targetAmount;
     private BigDecimal currentAmount = BigDecimal.ZERO;

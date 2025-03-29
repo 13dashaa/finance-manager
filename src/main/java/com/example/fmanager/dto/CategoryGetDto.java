@@ -14,7 +14,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CategoryGetDto {
-    private int id;
+    private Integer id;
     private String name;
     private Set<Integer> budgetIds = new HashSet<>();
     private Set<Integer> transactionIds;

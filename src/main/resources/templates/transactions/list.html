@@ -24,8 +24,6 @@
             <td th:text="${transaction.date}"></td>
             <td>
                 <a th:href="@{/transactions/{id}(id=${transaction.id})}" class="btn btn-sm btn-info">View</a>
-                <a th:href="@{/transactions/edit/{id}(id=${transaction.id})}" class="btn btn-sm btn-warning">Edit</a>
-                <a th:href="@{/transactions/delete/{id}(id=${transaction.id})}" class="btn btn-sm btn-danger">Delete</a>
             </td>
         </tr>
         </tbody>

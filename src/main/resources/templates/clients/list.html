@@ -8,7 +8,6 @@
 <div class="container">
     <h1>Clients</h1>
     <a href="/clients/new" class="btn btn-primary">Create New Client</a>
-    <a href="/clients/bulk" class="btn btn-success">Create Clients in Bulk</a>
     <table class="table">
         <thead>
         <tr>
@@ -23,7 +22,6 @@
             <td th:text="${client.email}"></td>
             <td>
                 <a th:href="@{/clients/{id}(id=${client.id})}" class="btn btn-sm btn-info">View</a>
-                <a th:href="@{/clients/delete/{id}(id=${client.id})}" class="btn btn-sm btn-danger">Delete</a>
             </td>
         </tr>
         </tbody>

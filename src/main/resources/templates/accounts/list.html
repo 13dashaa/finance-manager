@@ -8,7 +8,7 @@
 <div class="container">
   <h1>Accounts</h1>
   <a href="/accounts/new" class="btn btn-primary">Create New Account</a>
-  <a href="/accounts/bulk" class="btn btn-success">Create Accounts in Bulk</a>
+
 
   <div th:if="${clientId}">
     <h2>Accounts for Client Username: <span th:text="${clientId}"></span></h2>
@@ -30,8 +30,6 @@
       <td th:text="${account.clientUsername}"></td>
       <td>
         <a th:href="@{/accounts/{id}(id=${account.id})}" class="btn btn-sm btn-info">View</a>
-        <a th:href="@{/accounts/edit/{id}(id=${account.id})}" class="btn btn-sm btn-warning">Edit</a>
-        <a th:href="@{/accounts/delete/{id}(id=${account.id})}" class="btn btn-sm btn-danger">Delete</a>
       </td>
     </tr>
     </tbody>

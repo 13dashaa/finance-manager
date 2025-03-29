@@ -24,8 +24,6 @@
             <td th:text="${goal.endDate}"></td>
             <td>
                 <a th:href="@{/goals/{id}(id=${goal.id})}" class="btn btn-sm btn-info">View</a>
-                <a th:href="@{/goals/edit/{id}(id=${goal.id})}" class="btn btn-sm btn-warning">Edit</a>
-                <a th:href="@{/goals/delete/{id}(id=${goal.id})}" class="btn btn-sm btn-danger">Delete</a>
             </td>
         </tr>
         </tbody>

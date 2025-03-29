@@ -8,12 +8,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class TransactionGetDto {
-    private int id;
+    private Integer id;
     private String description;
     private double amount;
-    private int accountId;
+    private Integer accountId;
     private String accountName;
-    private int categoryId;
+    private Integer categoryId;
     private String categoryName;
     private LocalDateTime date;
     private LocalDateTime createdAt;

@@ -3,29 +3,175 @@
 <head>
   <title>Transaction Details</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    #editForm { margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+    dl dt { font-weight: bold; margin-top: 5px;}
+  </style>
 </head>
 <body>
-<div class="container">
+<div class="container mt-4">
+
   <h1>Transaction Details</h1>
+  <!-- Блок отображения деталей (ваш код) -->
   <dl>
+    <dt>ID</dt> <!-- Добавил ID -->
+    <dd th:text="${transaction.id}"></dd>
     <dt>Description</dt>
     <dd th:text="${transaction.description}"></dd>
     <dt>Amount</dt>
-    <dd th:text="${transaction.amount}"></dd>
+    <!-- Форматирование -->
+    <dd th:text="${transaction.amount != null ? #numbers.formatDecimal(transaction.amount, 1, 'COMMA', 2, 'POINT') : 'N/A'}"></dd>
     <dt>Date</dt>
-    <dd th:text="${transaction.date}"></dd>
+    <!-- Форматирование -->
+    <dd th:text="${transaction.date != null ? #temporals.format(transaction.date, 'yyyy-MM-dd') : 'N/A'}"></dd>
     <dt>Category</dt>
     <dd>
-      <a th:href="@{/categories/{id}(id=${transaction.categoryId})}" th:text="${transaction.categoryName}"></a>
+      <a th:if="${transaction.categoryId != null}" th:href="@{/categories/{id}(id=${transaction.categoryId})}" th:text="${transaction.categoryName ?: 'Unknown'}">Category Name</a>
+      <span th:unless="${transaction.categoryId != null}">N/A</span>
     </dd>
     <dt>Account</dt>
     <dd>
-      <a th:href="@{/accounts/{id}(id=${transaction.accountId})}" th:text="${transaction.accountName}"></a>
+      <a th:if="${transaction.accountId != null}" th:href="@{/accounts/{id}(id=${transaction.accountId})}" th:text="${transaction.accountName ?: 'Unknown'}">Account Name</a>
+      <span th:unless="${transaction.accountId != null}">N/A</span>
     </dd>
   </dl>
 
-  <a th:href="@{/transactions/edit/{id}(id=${transaction.id})}" class="btn btn-primary">Edit</a>
+  <!-- Кнопки действий -->
+  <button id="editButton" class="btn btn-primary">Edit</button>
+  <button id="deleteButton" class="btn btn-danger">Delete</button>
   <a href="/transactions" class="btn btn-secondary">Back to List</a>
+
+  <div id="editForm" style="display:none;">
+    <h2>Edit Transaction</h2>
+    <form id="updateForm" th:object="${transactionUpdateDto}">
+      <div class="form-group">
+        <label for="description">Description</label>
+        <input type="text" class="form-control" id="description" th:field="*{description}" required="required"/>
+        <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="text-danger"></span>
+      </div>
+      <div class="form-group">
+        <label for="amount">Amount</label>
+        <input type="number" step="any" class="form-control" id="amount" th:field="*{amount}" required="required"/>
+        <span th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}" class="text-danger"></span>
+      </div>
+      <div class="form-group">
+        <label for="date">Date and Time</label>
+        <input type="datetime-local" class="form-control" id="date" th:field="*{date}" required="required"/>
+        <span th:if="${#fields.hasErrors('date')}" th:errors="*{date}" class="text-danger"></span>
+      </div>
+      <div class="form-group">
+        <label for="categoryId">Category</label>
+        <select class="form-control" id="categoryId" th:field="*{categoryId}" required="required">
+          <option value="">Select Category</option>
+          <option th:each="category : ${categories}"
+                  th:value="${category.id}"
+                  th:text="${category.name}">Category Name</option>
+        </select>
+        <span th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}" class="text-danger"></span>
+      </div>
+      <div class="form-group">
+        <label for="accountId">Account</label>
+        <select class="form-control" id="accountId" th:field="*{accountId}" required="required">
+          <option value="">Select Account</option>
+          <option th:each="account : ${accounts}"
+                  th:value="${account.id}"
+                  th:text="${account.name}">Account Name</option>
+        </select>
+        <span th:if="${#fields.hasErrors('accountId')}" th:errors="*{accountId}" class="text-danger"></span>
+      </div>
+      <button type="button" id="updateButton" class="btn btn-success">Update Transaction</button>
+      <button type="button" id="cancelButton" class="btn btn-secondary">Cancel</button>
+    </form>
+  </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script th:inline="javascript">
+  /*<![CDATA[*/
+  $(document).ready(function () {
+    const transactionId = /*[[${transaction != null ? transaction.id : null}]]*/ null;
+
+    if (!transactionId) {
+      console.error("Transaction ID not found in the model!");
+      $("#editButton, #deleteButton").prop("disabled", true).addClass("disabled");
+    }
+
+    $("#editButton").click(function () {
+      $("#editForm").slideDown();
+      $(this).hide();
+    });
+    $("#cancelButton").click(function () {
+      $("#editForm").slideUp();
+      $("#editButton").show();
+    });
+
+    $("#updateButton").click(function (event) {
+      event.preventDefault();
+      if (!transactionId) return;
+
+      var transactionData = {
+        description: $("#description").val(),
+        amount: $("#amount").val() ? parseFloat($("#amount").val()) : null,
+        date: $("#date").val() || null,
+        categoryId: $("#categoryId").val() ? parseInt($("#categoryId").val()) : null,
+        accountId: $("#accountId").val() ? parseInt($("#accountId").val()) : null
+      };
+
+      if (!transactionData.description || transactionData.description.trim() === '' ||
+              transactionData.amount === null ||
+              !transactionData.date ||
+              transactionData.categoryId === null || transactionData.accountId === null) {
+        alert("Please fill in all fields correctly.");
+        return;
+      }
+      console.log("Sending data:", JSON.stringify(transactionData));
+
+      $.ajax({
+        type: "PUT",
+        contentType: "application/json",
+        url: "/transactions/" + transactionId,
+        data: JSON.stringify(transactionData),
+        dataType: 'json',
+        success: function (data, textStatus, xhr) {
+          console.log("Update successful:", xhr.status);
+          window.location.reload();
+        },
+        error: function (xhr, textStatus, errorThrown) {
+          console.error("ERROR updating transaction: ", xhr.status, errorThrown, xhr.responseText);
+          alert("Error updating transaction! Status: " + xhr.status + "\n" + (xhr.responseText || errorThrown));
+        }
+      });
+    });
+
+    $("#deleteButton").click(function (event) {
+      event.preventDefault();
+      if (!transactionId) return;
+
+      if (confirm("Are you sure you want to delete this transaction?")) {
+
+        $.ajax({
+          type: "DELETE",
+          url: "/transactions/" + transactionId,
+          success: function (data, textStatus, xhr) {
+            if (xhr.status === 204) {
+              console.log("Delete successful");
+              window.location.href = "/transactions"; 
+            } else {
+              alert("Transaction deleted, but received an unexpected response status: " + xhr.status);
+              window.location.href = "/transactions";
+            }
+          },
+          error: function (xhr, textStatus, errorThrown) {
+            console.error("ERROR deleting transaction: ", xhr.status, errorThrown, xhr.responseText);
+            alert("Error deleting transaction! Status: " + xhr.status + "\n" + (xhr.responseText || errorThrown));
+          }
+        });
+      }
+    });
+  });
+  /*]]>*/
+</script>
+
 </body>
 </html>

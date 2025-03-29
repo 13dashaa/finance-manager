@@ -8,13 +8,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
+
 @Getter
 @Setter
 public class AccountGetDto {
 
-    private int id;
+    private Integer id;
     private String name;
-    private int clientId;
+    private Integer clientId;
     private double balance;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

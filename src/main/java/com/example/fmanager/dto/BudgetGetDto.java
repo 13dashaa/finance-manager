@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 public class BudgetGetDto {
 
-    private int id;
+    private Integer id;
     private Set<Integer> clientIds;
     private Set<String> clientUsernames;
     private Integer categoryId;
