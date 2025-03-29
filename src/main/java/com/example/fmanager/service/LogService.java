@@ -34,7 +34,6 @@ public class LogService {
                 if (existingLogId != null) {
                     return existingLogId;
                 }
-
                 Path logPath = Paths.get(LOG_FILE_PATH);
                 if (!Files.exists(logPath)) {
                     throw new FileNotFoundException("Log file not found: " + LOG_FILE_PATH);
