@@ -5,7 +5,7 @@ WORKDIR /app
 COPY build.gradle settings.gradle ./
 COPY gradlew .
 COPY gradle/ gradle/
-
+RUN chmod +x ./gradlew
 RUN ./gradlew dependencies
 
 COPY src ./src
