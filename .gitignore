@@ -1,6 +1,6 @@
 HELP.md
 .gradle
-!**/build/libs/
+!build/libs/finance-manager.jar
 /build
 .env
 !gradle/wrapper/gradle-wrapper.jar
