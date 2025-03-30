@@ -53,7 +53,8 @@ class TransactionServiceTest {
 
         account = new Account();
         account.setId(1);
-        account.setClient(client);  // Устанавливаем связь с клиентом
+        account.setClient(client);
+        account.setBalance(1000);
 
         category = new Category();
         category.setId(1);
@@ -177,7 +178,7 @@ class TransactionServiceTest {
     void updateTransaction_Success() {
         TransactionCreateDto updateDto = new TransactionCreateDto(
                 "Updated Transaction",
-                300,
+                3,
                 LocalDateTime.now(),
                 1,
                 1);

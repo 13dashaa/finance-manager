@@ -25,14 +25,25 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
-    sourceCompatibility = '21'
-    targetCompatibility = '21'
 }
 
 repositories {
     mavenCentral()
 }
+bootJar {
+    archiveFileName = 'finance-manager.jar'
+    manifest {
+        attributes(
+                'Main-Class': 'org.springframework.boot.loader.JarLauncher',
+                'Start-Class': 'com.example.fmanager.FinanceManagerApplication'
+        )
+    }
+    layered {
+        enabled = true
+    }
+    requiresUnpack '**/spring-boot-loader-*.jar'
 
+}
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -47,7 +58,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-
+    testImplementation 'com.h2database:h2:2.2.224'
+    testImplementation 'org.springframework.boot:spring-boot-test-autoconfigure'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -60,15 +72,7 @@ tasks.named('test') {
     useJUnitPlatform()
     finalizedBy jacocoTestReport
 }
-bootJar {
-    archiveFileName = 'finance-manager.jar'
-    manifest {
-        attributes(
-                'Main-Class': 'org.springframework.boot.loader.JarLauncher',
-                'Start-Class': 'com.example.fmanager.FinanceManagerApplication'
-        )
-    }
-}
+
 jacocoTestReport {
 
     reports {
