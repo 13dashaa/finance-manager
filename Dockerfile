@@ -10,7 +10,7 @@ RUN ./gradlew dependencies
 
 COPY src ./src
 
-RUN ./gradlew build -x test
+RUN ./gradlew bootJar -x test
 
 
 FROM eclipse-temurin:21-jre-alpine
