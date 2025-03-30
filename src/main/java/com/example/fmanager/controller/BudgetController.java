@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.server.ResponseStatusException;
 
 @Controller
@@ -39,6 +38,7 @@ public class BudgetController {
     private final BudgetService budgetService;
     private final CategoryService categoryService;
     private final ClientService clientService;
+    private static final String CLIENTS = "clients";
 
     public BudgetController(BudgetService budgetService,
                             CategoryService categoryService,
@@ -54,7 +54,7 @@ public class BudgetController {
         List<Category> categories = categoryService.getAllCategories();
         model.addAttribute("categories", categories);
         List<Client> clients = clientService.findAllClients();
-        model.addAttribute("clients", clients);
+        model.addAttribute(CLIENTS, clients);
 
         return "budgets/create";
     }
@@ -75,7 +75,7 @@ public class BudgetController {
             List<Category> categories = categoryService.getAllCategories();
             model.addAttribute("categories", categories);
             List<Client> clients = clientService.findAllClients();
-            model.addAttribute("clients", clients);
+            model.addAttribute(CLIENTS, clients);
             return "budgets/create";
         }
 
@@ -115,7 +115,7 @@ public class BudgetController {
                             budget.getClientIds()
                     );
                     model.addAttribute("budgetUpdateDto", budgetUpdateDto);
-                    model.addAttribute("clients", clients);
+                    model.addAttribute(CLIENTS, clients);
                     return "budgets/details";
                 })
                 .orElseThrow(() -> new ResponseStatusException(
@@ -129,7 +129,7 @@ public class BudgetController {
         @ApiResponse(responseCode = "204", description = "Budget deleted successfully"),
         @ApiResponse(responseCode = "404", description = "Budget not found")
     })
-    public ResponseEntity deleteBudgetApi(
+    public ResponseEntity<Object> deleteBudgetApi(
             @Parameter(description = "ID of the budget to delete", example = "1")
             @PathVariable int id
     ) {
@@ -156,7 +156,6 @@ public class BudgetController {
         @ApiResponse(responseCode = "404", description = "Budget not found"),
         @ApiResponse(responseCode = "400", description = "Invalid input")
     })
-    @ResponseBody
     public ResponseEntity<String> updateBudgetApi(
             @Parameter(description = "ID of the budget to update", example = "1")
             @PathVariable int id,

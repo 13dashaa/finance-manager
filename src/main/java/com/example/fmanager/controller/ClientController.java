@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.server.ResponseStatusException;
 
 @Controller
@@ -111,8 +110,7 @@ public class ClientController {
         @ApiResponse(responseCode = "204", description = "Client deleted successfully"),
         @ApiResponse(responseCode = "404", description = "Client not found")
     })
-    @ResponseBody
-    public ResponseEntity<?> deleteClientApi(
+    public ResponseEntity<Object> deleteClientApi(
             @Parameter(description = "ID of the client to delete", example = "1")
             @PathVariable int id
     ) {
@@ -166,8 +164,7 @@ public class ClientController {
         @ApiResponse(responseCode = "404", description = "Client not found"),
         @ApiResponse(responseCode = "400", description = "Invalid input")
     })
-    @ResponseBody
-    public ResponseEntity<?> updateClientApi(
+    public ResponseEntity<Object> updateClientApi(
             @Parameter(description = "ID of the client to update", example = "1")
             @PathVariable int id,
             @Valid @RequestBody ClientUpdateDto clientUpdateDto,

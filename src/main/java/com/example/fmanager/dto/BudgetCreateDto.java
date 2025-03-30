@@ -1,6 +1,5 @@
 package com.example.fmanager.dto;
 
-import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -15,7 +14,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class BudgetCreateDto {
     @NotNull(message = "Period cannot be null")
-    @Future(message = "The end of period must be in future.")
     private Integer period;
     @NotNull(message = "Limitation cannot be null")
     @Positive(message = "Limitation cannot be negative")

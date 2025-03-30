@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.server.ResponseStatusException;
 
 @Controller
@@ -40,6 +39,8 @@ public class TransactionController {
     private final TransactionService transactionService;
     private final CategoryService categoryService;
     private final AccountService accountService;
+    private static final String CATEGORIES = "categories";
+    private static final String ACCOUNTS = "accounts";
 
     public TransactionController(
             TransactionService transactionService,
@@ -56,9 +57,9 @@ public class TransactionController {
         model.addAttribute("transactionCreateDto",
                 new TransactionCreateDto("", 0.0, LocalDateTime.now(), 0, 0));
         List<Category> categories = categoryService.getAllCategories();
-        model.addAttribute("categories", categories);
+        model.addAttribute(CATEGORIES, categories);
         List<Account> accounts = accountService.getAllAccounts();
-        model.addAttribute("accounts", accounts);
+        model.addAttribute(ACCOUNTS, accounts);
         return "transactions/create";
     }
 
@@ -77,9 +78,9 @@ public class TransactionController {
     ) {
         if (bindingResult.hasErrors()) {
             List<Category> categories = categoryService.getAllCategories();
-            model.addAttribute("categories", categories);
+            model.addAttribute(CATEGORIES, categories);
             List<Account> accounts = accountService.getAllAccounts();
-            model.addAttribute("accounts", accounts);
+            model.addAttribute(ACCOUNTS, accounts);
             return "transactions/create";
         }
         transactionService.createTransaction(transactionCreateDto);
@@ -113,9 +114,9 @@ public class TransactionController {
                 .map(transaction -> {
                     model.addAttribute("transaction", transaction);
                     List<Category> categories = categoryService.getAllCategories();
-                    model.addAttribute("categories", categories);
+                    model.addAttribute(CATEGORIES, categories);
                     List<Account> accounts = accountService.getAllAccounts();
-                    model.addAttribute("accounts", accounts);
+                    model.addAttribute(ACCOUNTS, accounts);
 
                     TransactionCreateDto transactionUpdateDto = new TransactionCreateDto(
                             transaction.getDescription(),
@@ -159,8 +160,7 @@ public class TransactionController {
         @ApiResponse(responseCode = "404", description = "Transaction not found"),
         @ApiResponse(responseCode = "400", description = "Invalid input")
     })
-    @ResponseBody // Важно
-    public ResponseEntity updateTransactionApi(
+    public ResponseEntity<Object> updateTransactionApi(
             @Parameter(description = "ID of the transaction to update", example = "1")
             @PathVariable int id,
             @Valid @RequestBody TransactionCreateDto transactionUpdateDto,
@@ -197,8 +197,7 @@ public class TransactionController {
         @ApiResponse(responseCode = "204", description = "Transaction deleted successfully"),
         @ApiResponse(responseCode = "404", description = "Transaction not found")
     })
-    @ResponseBody
-    public ResponseEntity deleteTransactionApi(
+    public ResponseEntity<Object> deleteTransactionApi(
             @Parameter(description = "ID of the transaction to delete", example = "1")
             @PathVariable int id
     ) {

@@ -1,5 +1,6 @@
 package com.example.fmanager.controller;
 
+import com.example.fmanager.dto.BudgetGetDto;
 import com.example.fmanager.dto.CategoryCreateDto;
 import com.example.fmanager.dto.CategoryGetDto;
 import com.example.fmanager.service.BudgetService;
@@ -24,7 +25,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.server.ResponseStatusException;
 
 @Controller
@@ -78,7 +78,7 @@ public class CategoryController {
                     model.addAttribute("budgetNames",
                             category.getBudgetIds().stream()
                                     .map(budgetId -> budgetService.getBudgetById(budgetId)
-                                            .map(budget -> budget.getCategoryName())
+                                            .map(BudgetGetDto::getCategoryName)
                                             .orElse("Budget Not Found"))
                                     .toList());
                     CategoryCreateDto categoryUpdateDto = new CategoryCreateDto(category.getName());
@@ -97,8 +97,7 @@ public class CategoryController {
         @ApiResponse(responseCode = "204", description = "Category deleted successfully"),
         @ApiResponse(responseCode = "404", description = "Category not found")
     })
-    @ResponseBody
-    public ResponseEntity<?> deleteCategoryApi(
+    public ResponseEntity<Object> deleteCategoryApi(
             @Parameter(description = "ID of the category to delete", example = "1")
             @PathVariable int id
     ) {
@@ -114,7 +113,7 @@ public class CategoryController {
             throw rse;
         } catch (Exception e) {
             return new ResponseEntity<>(
-                    "An internal error occurred.", HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error: " + e.getMessage(), HttpStatus.BAD_REQUEST
             );
         }
     }
@@ -126,8 +125,7 @@ public class CategoryController {
         @ApiResponse(responseCode = "404", description = "Category not found"),
         @ApiResponse(responseCode = "400", description = "Invalid input")
     })
-    @ResponseBody
-    public ResponseEntity<?> updateCategoryApi(
+    public ResponseEntity<Object> updateCategoryApi(
             @Parameter(description = "ID of the category to update", example = "1")
             @PathVariable int id,
             @Valid @RequestBody CategoryCreateDto categoryUpdateDto, // Принимаем JSON
@@ -150,7 +148,7 @@ public class CategoryController {
             throw rse;
         } catch (Exception e) {
             return new ResponseEntity<>(
-                    "An internal error occurred.", HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error: " + e, HttpStatus.BAD_REQUEST
             );
         }
     }

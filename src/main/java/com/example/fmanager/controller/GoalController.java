@@ -3,7 +3,6 @@ package com.example.fmanager.controller;
 import com.example.fmanager.dto.GoalCreateDto;
 import com.example.fmanager.dto.GoalGetDto;
 import com.example.fmanager.models.Client;
-import com.example.fmanager.models.Goal;
 import com.example.fmanager.service.ClientService;
 import com.example.fmanager.service.GoalService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,8 +26,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 @Controller
@@ -134,8 +131,7 @@ public class GoalController {
         @ApiResponse(responseCode = "204", description = "Goal deleted successfully"),
         @ApiResponse(responseCode = "404", description = "Goal not found")
     })
-    @ResponseBody
-    public ResponseEntity<?> deleteGoalApi(
+    public ResponseEntity<Object> deleteGoalApi(
             @Parameter(description = "ID of the goal to delete", example = "1")
             @PathVariable int id
     ) {
@@ -163,8 +159,7 @@ public class GoalController {
         @ApiResponse(responseCode = "404", description = "Goal not found"),
         @ApiResponse(responseCode = "400", description = "Invalid input")
     })
-    @ResponseBody // Важно
-    public ResponseEntity<?> updateGoalApi(
+    public ResponseEntity<Object> updateGoalApi(
             @Parameter(description = "ID of the goal to update", example = "1")
             @PathVariable int id,
             @Valid @RequestBody GoalCreateDto goalUpdateDto,
