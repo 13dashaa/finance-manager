@@ -5,10 +5,6 @@ plugins {
     id "jacoco"
     id "org.sonarqube" version "6.0.1.5171"
 }
-springBoot {
-
-    mainClass = 'com.example.fmanager.FinanceManagerApplication'
-}
 jacoco {
     toolVersion = "0.8.11"
 }
@@ -23,15 +19,14 @@ sonarqube {
 }
 
 
-
-
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
-
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
+    sourceCompatibility = '21'
+    targetCompatibility = '21'
 }
 
 repositories {
@@ -64,6 +59,15 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
     finalizedBy jacocoTestReport
+}
+bootJar {
+    archiveFileName = 'finance-manager.jar'
+    manifest {
+        attributes(
+                'Main-Class': 'org.springframework.boot.loader.JarLauncher',
+                'Start-Class': 'com.example.fmanager.FinanceManagerApplication'
+        )
+    }
 }
 jacocoTestReport {
 
