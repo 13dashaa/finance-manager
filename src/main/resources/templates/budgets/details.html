@@ -92,7 +92,6 @@
 <script th:inline="javascript">
     $(document).ready(function () {
         const budgetId = /*[[${budget != null ? budget.id : null}]]*/ null;
-        null;
         if (!budgetId) {
             console.error("Budget ID not found in the model!");
             $("#editButton, #deleteButton").prop("disabled", true).addClass("disabled");
