@@ -12,17 +12,14 @@
 <div class="container mt-4">
 
   <h1>Transaction Details</h1>
-  <!-- Блок отображения деталей (ваш код) -->
+
   <dl>
-    <dt>ID</dt> <!-- Добавил ID -->
-    <dd th:text="${transaction.id}"></dd>
     <dt>Description</dt>
     <dd th:text="${transaction.description}"></dd>
     <dt>Amount</dt>
-    <!-- Форматирование -->
     <dd th:text="${transaction.amount != null ? #numbers.formatDecimal(transaction.amount, 1, 'COMMA', 2, 'POINT') : 'N/A'}"></dd>
     <dt>Date</dt>
-    <!-- Форматирование -->
+
     <dd th:text="${transaction.date != null ? #temporals.format(transaction.date, 'yyyy-MM-dd') : 'N/A'}"></dd>
     <dt>Category</dt>
     <dd>
@@ -36,7 +33,6 @@
     </dd>
   </dl>
 
-  <!-- Кнопки действий -->
   <button id="editButton" class="btn btn-primary">Edit</button>
   <button id="deleteButton" class="btn btn-danger">Delete</button>
   <a href="/transactions" class="btn btn-secondary">Back to List</a>
@@ -85,7 +81,10 @@
   </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script
+        src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha384-vtXRMe3mGCbOeY7l30aIg8H9p3GdeSe4IFlP6G8JMa7o7lXvnz3GFKzPxzJdPfGK"
+        crossorigin="anonymous"></script>
 
 <script th:inline="javascript">
   /*<![CDATA[*/
