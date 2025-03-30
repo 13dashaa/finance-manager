@@ -66,13 +66,14 @@
                     <legend class="col-form-label pt-0">Associated Clients:</legend>
                     <th:block th:each="client : ${clients}">
                         <div class="form-check">
+                            <label class="form-check-label">
                             <input class="form-check-input"
                                    type="checkbox"
                                    name="clientIds"
                             th:value="${client.id}"
                             th:id="'client-' + ${client.id}"
                             th:checked="${budgetUpdateDto.clientIds != null && #lists.contains(budgetUpdateDto.clientIds, client.id)}" />
-                            <label class="form-check-label">
+
                                 <input class="form-check-input" type="checkbox" name="clientIds" th:value="${client.id}"/>
                                 <span th:text="${client.username}"></span>
                             </label>
