@@ -36,7 +36,10 @@
   <button id="editButton" class="btn btn-primary">Edit</button>
   <button id="deleteButton" class="btn btn-danger">Delete</button>
   <a href="/transactions" class="btn btn-secondary">Back to List</a>
-
+  <div id="errorAlert" class="alert alert-danger" style="display: none;">
+    <button type="button" class="close" onclick="$('#errorAlert').hide();">&times;</button>
+    <strong>Error!</strong> <span id="errorMessage"></span>
+  </div>
   <div id="editForm" style="display:none;">
     <h2>Edit Transaction</h2>
     <form id="updateForm" th:object="${transactionUpdateDto}">
@@ -109,6 +112,9 @@
       event.preventDefault();
       if (!transactionId) return;
 
+      // Скрываем предыдущие ошибки
+      $("#errorAlert").hide();
+
       var transactionData = {
         description: $("#description").val(),
         amount: $("#amount").val() ? parseFloat($("#amount").val()) : null,
@@ -117,13 +123,15 @@
         accountId: $("#accountId").val() ? parseInt($("#accountId").val()) : null
       };
 
+      // Валидация полей
       if (!transactionData.description || transactionData.description.trim() === '' ||
               transactionData.amount === null ||
               !transactionData.date ||
               transactionData.categoryId === null || transactionData.accountId === null) {
-        alert("Please fill in all fields correctly.");
+        showError("Please fill in all fields correctly.");
         return;
       }
+
       console.log("Sending data:", JSON.stringify(transactionData));
 
       $.ajax({
@@ -138,10 +146,32 @@
         },
         error: function (xhr, textStatus, errorThrown) {
           console.error("ERROR updating transaction: ", xhr.status, errorThrown, xhr.responseText);
-          alert("Error updating transaction! Status: " + xhr.status + "\n" + (xhr.responseText || errorThrown));
+
+          try {
+            // Пытаемся разобрать JSON ответ с ошибкой
+            var errorResponse = JSON.parse(xhr.responseText);
+            if (errorResponse.message) {
+              showError(errorResponse.message);
+            } else {
+              showError("Error updating transaction: " + xhr.statusText);
+            }
+          } catch (e) {
+            // Если не получилось разобрать JSON, показываем весь ответ
+            showError(xhr.responseText || "An unknown error occurred");
+          }
         }
       });
     });
+
+// Функция для отображения ошибок
+    function showError(message) {
+      $("#errorMessage").text(message);
+      $("#errorAlert").show();
+      // Прокручиваем страницу к сообщению об ошибке
+      $('html, body').animate({
+        scrollTop: $("#errorAlert").offset().top - 20
+      }, 500);
+    }
 
     $("#deleteButton").click(function (event) {
       event.preventDefault();

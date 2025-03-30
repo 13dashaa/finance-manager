@@ -3,10 +3,33 @@
 <head>
     <title>Create Transaction</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .error-container {
+            margin-bottom: 20px;
+        }
+        .error-container .close {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            color: inherit;
+            font-size: 1.5rem;
+            opacity: 0.8;
+            cursor: pointer;
+        }
+        .error-container .close:hover {
+            opacity: 1;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
     <h1>Create Transaction</h1>
+
+    <div th:if="${errorMessage}" class="alert alert-danger error-container" role="alert">
+        <button type="button" class="close" onclick="this.parentElement.style.display='none'">&times;</button>
+        <strong>Error!</strong> <span th:text="${errorMessage}"></span>
+    </div>
+
     <form th:action="@{/transactions}" th:object="${transactionCreateDto}" method="post">
         <div class="form-group">
             <label for="description">Description:</label>
@@ -40,8 +63,20 @@
             <span th:if="${#fields.hasErrors('accountId')}" th:errors="*{accountId}" class="text-danger"></span>
         </div>
         <button type="submit" class="btn btn-primary">Create</button>
+        <a href="/transactions" class="btn btn-secondary">Back to List</a>
     </form>
-    <a href="/transactions" class="btn btn-secondary">Back to List</a>
 </div>
+
+<script>
+    // Закрытие сообщения об ошибке при клике на крестик
+    document.addEventListener('DOMContentLoaded', function() {
+        const closeButtons = document.querySelectorAll('.close');
+        closeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                this.parentElement.style.display = 'none';
+            });
+        });
+    });
+</script>
 </body>
 </html>

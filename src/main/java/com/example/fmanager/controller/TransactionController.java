@@ -2,6 +2,7 @@ package com.example.fmanager.controller;
 
 import com.example.fmanager.dto.TransactionCreateDto;
 import com.example.fmanager.dto.TransactionGetDto;
+import com.example.fmanager.exception.InvalidDataException;
 import com.example.fmanager.models.Account;
 import com.example.fmanager.models.Category;
 import com.example.fmanager.service.AccountService;
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -30,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/transactions")
@@ -74,8 +77,10 @@ public class TransactionController {
             @Valid
             @ModelAttribute("transactionCreateDto") TransactionCreateDto transactionCreateDto,
             BindingResult bindingResult,
+            RedirectAttributes redirectAttributes,
             Model model
     ) {
+
         if (bindingResult.hasErrors()) {
             List<Category> categories = categoryService.getAllCategories();
             model.addAttribute(CATEGORIES, categories);
@@ -83,8 +88,14 @@ public class TransactionController {
             model.addAttribute(ACCOUNTS, accounts);
             return "transactions/create";
         }
-        transactionService.createTransaction(transactionCreateDto);
-        return "redirect:/transactions";
+        try {
+            transactionService.createTransaction(transactionCreateDto);
+            return "redirect:/transactions";
+
+        } catch (InvalidDataException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/transactions/new";
+        }
     }
 
     @GetMapping
@@ -174,6 +185,9 @@ public class TransactionController {
         try {
             transactionService.updateTransaction(id, transactionUpdateDto);
             return ResponseEntity.ok().body("{}");
+        } catch (InvalidDataException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage()));
         } catch (ResponseStatusException rse) {
             if (rse.getStatusCode() == HttpStatus.NOT_FOUND) {
                 return new ResponseEntity<>(

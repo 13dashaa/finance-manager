@@ -6,6 +6,7 @@ import static com.example.fmanager.exception.NotFoundMessages.TRANSACTION_NOT_FO
 
 import com.example.fmanager.dto.TransactionCreateDto;
 import com.example.fmanager.dto.TransactionGetDto;
+import com.example.fmanager.exception.InvalidDataException;
 import com.example.fmanager.exception.NotFoundException;
 import com.example.fmanager.models.Account;
 import com.example.fmanager.models.Category;
@@ -73,12 +74,21 @@ public class TransactionService {
 
     public Transaction createTransaction(TransactionCreateDto transactionCreateDto) {
         Transaction transaction = new Transaction();
-        transaction.setAmount(transactionCreateDto.getAmount());
         transaction.setDate(transactionCreateDto.getDate());
         transaction.setDescription(transactionCreateDto.getDescription());
         Account transactionalAccount = accountRepository
                 .findById(transactionCreateDto.getAccountId())
                 .orElseThrow(() -> new RuntimeException(ACCOUNT_NOT_FOUND_MESSAGE));
+        if (transactionalAccount.getBalance() + transactionCreateDto.getAmount() < 0) {
+            throw new InvalidDataException(
+                    "Insufficient funds: transaction would result in negative balance"
+            );
+        }
+        transaction.setAmount(transactionCreateDto.getAmount());
+        transactionalAccount.setBalance(
+                transactionalAccount.getBalance() + transaction.getAmount()
+        );
+        accountRepository.save(transactionalAccount);
         transaction.setAccount(transactionalAccount);
         Category category = categoryRepository.findById(transactionCreateDto.getCategoryId())
                 .orElseThrow(() -> new RuntimeException(CATEGORY_NOT_FOUND_MESSAGE));
@@ -96,11 +106,19 @@ public class TransactionService {
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(TRANSACTION_NOT_FOUND_MESSAGE));
         transaction.setDescription(transactionDetails.getDescription());
-        transaction.setAmount(transactionDetails.getAmount());
         transaction.setDate(transactionDetails.getDate());
-        Transaction savedTransaction = transactionRepository.save(transaction);
         Account account = accountRepository.findById(transaction.getAccount().getId())
                 .orElseThrow(() -> new IllegalArgumentException(ACCOUNT_NOT_FOUND_MESSAGE));
+        double amountDifference = transactionDetails.getAmount() - transaction.getAmount();
+        if (account.getBalance() + amountDifference < 0) {
+            throw new InvalidDataException(
+                    "Insufficient funds: transaction update would result in negative balance"
+            );
+        }
+        transaction.setAmount(transactionDetails.getAmount());
+        Transaction savedTransaction = transactionRepository.save(transaction);
+        account.setBalance(account.getBalance() + amountDifference);
+        accountRepository.save(account);
         clearCacheForClientAndCategory(account.getClient().getId(),
                 savedTransaction.getCategory().getId());
         return TransactionGetDto.convertToDto(savedTransaction);
