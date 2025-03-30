@@ -31,6 +31,8 @@ repositories {
     mavenCentral()
 }
 bootJar {
+    loaderImplementation = org.springframework.boot.loader.tools.LoaderImplementation.CLASSIC
+
     archiveFileName = 'finance-manager.jar'
     manifest {
         attributes(
