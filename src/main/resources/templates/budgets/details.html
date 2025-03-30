@@ -66,20 +66,24 @@
                     <legend class="col-form-label pt-0">Associated Clients:</legend>
                     <th:block th:each="client : ${clients}">
                         <div class="form-check">
-                            <label class="form-check-label">
                             <input class="form-check-input"
                                    type="checkbox"
                                    name="clientIds"
-                            th:value="${client.id}"
-                            th:id="'client-' + ${client.id}"
-                            th:checked="${budgetUpdateDto.clientIds != null && #lists.contains(budgetUpdateDto.clientIds, client.id)}" />
+                                   th:value="${client.id}"
+                                   th:id="'client-' + ${client.id}"
+                                   th:checked="${budgetUpdateDto.clientIds != null && #lists.contains(budgetUpdateDto.clientIds, client.id)}"/>
 
-                                <input class="form-check-input" type="checkbox" name="clientIds" th:value="${client.id}"/>
-                                <span th:text="${client.username}"></span>
+                            <!-- sonar-ignore -->
+                            <label class="form-check-label"
+                                   th:for="'client-' + ${client.id}"
+                                   th:text="${client.username}">
+                                Client Name
                             </label>
+
                         </div>
                     </th:block>
-                    <span th:if="${#fields.hasErrors('clientIds')}" th:errors="*{clientIds}" class="text-danger d-block mt-2"></span>
+                    <span th:if="${#fields.hasErrors('clientIds')}" th:errors="*{clientIds}"
+                          class="text-danger d-block mt-2"></span>
                 </fieldset>
             </div>
             <button type="button" id="updateButton" class="btn btn-success">Update Budget</button>
@@ -88,7 +92,10 @@
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script
+        src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha384-vtXRMe3mGCbOeY7l30aIg8H9p3GdeSe4IFlP6G8JMa7o7lXvnz3GFKzPxzJdPfGK"
+        crossorigin="anonymous"></script>
 <script th:inline="javascript">
     $(document).ready(function () {
         const budgetId = /*[[${budget != null ? budget.id : null}]]*/ null;
