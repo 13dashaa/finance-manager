@@ -20,7 +20,7 @@ services:
     build: .
     container_name: finance-manager-app
     ports:
-      - "8080:8080"
+      - "10000:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB_NAME}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
