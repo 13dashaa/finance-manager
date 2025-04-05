@@ -37,7 +37,7 @@ public class Account {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL,
-               orphanRemoval = true)
+            orphanRemoval = true)
     private Set<Transaction> transactions = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)

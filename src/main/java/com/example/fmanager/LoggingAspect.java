@@ -18,7 +18,7 @@ public class LoggingAspect {
     public void logBefore(JoinPoint joinPoint) {
         if (logger.isInfoEnabled()) {
             logger.info("Executing method: {} with args: {}",
-                  joinPoint.getSignature().toShortString(), joinPoint.getArgs());
+                    joinPoint.getSignature().toShortString(), joinPoint.getArgs());
         }
     }
 

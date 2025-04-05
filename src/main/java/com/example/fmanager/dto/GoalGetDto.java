@@ -1,7 +1,6 @@
 package com.example.fmanager.dto;
 
 import com.example.fmanager.models.Goal;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,8 +10,8 @@ import lombok.Setter;
 public class GoalGetDto {
     private Integer id;
     private String name;
-    private BigDecimal targetAmount;
-    private BigDecimal currentAmount = BigDecimal.ZERO;
+    private double targetAmount;
+    private double currentAmount = 0;
     private LocalDate startDate;
     private LocalDate endDate;
     private Integer clientId;

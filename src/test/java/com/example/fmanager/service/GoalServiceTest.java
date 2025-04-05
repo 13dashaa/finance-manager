@@ -1,9 +1,10 @@
 package com.example.fmanager.service;
 
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import com.example.fmanager.dto.GoalCreateDto;
 import com.example.fmanager.dto.GoalGetDto;
 import com.example.fmanager.exception.NotFoundException;
@@ -11,15 +12,23 @@ import com.example.fmanager.models.Client;
 import com.example.fmanager.models.Goal;
 import com.example.fmanager.repository.ClientRepository;
 import com.example.fmanager.repository.GoalRepository;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class GoalServiceTest {

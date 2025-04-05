@@ -36,6 +36,18 @@ public class BudgetService {
         this.clientRepository = clientRepository;
     }
 
+    public List<BudgetGetDto> getBudgetsByClientIdAndCategoryId(int clientId, int categoryId) {
+        if (!clientRepository.existsById(clientId)) {
+            throw new NotFoundException(CLIENT_NOT_FOUND_MESSAGE + clientId);
+        }
+        List<Budget> budgets = categoryRepository.findById(categoryId)
+                .map(category -> budgetRepository.findByCategoryIdAndClientId(category.getId(), clientId))
+                .orElseThrow(() -> new NotFoundException(CATEGORY_NOT_FOUND_MESSAGE + categoryId));
+        return budgets.stream()
+                .map(BudgetGetDto::convertToDto)
+                .toList();
+    }
+
     public List<BudgetGetDto> getAllBudgets() {
         List<Budget> budgets = budgetRepository.findAll();
         List<BudgetGetDto> budgetGetDtos = new ArrayList<>();

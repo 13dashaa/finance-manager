@@ -1,6 +1,7 @@
 package com.example.fmanager.exception;
 
 import static com.example.fmanager.exception.NotFoundMessages.BAD_REQUEST;
+import static com.example.fmanager.exception.NotFoundMessages.INVALID_DATA;
 
 import com.example.fmanager.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -21,6 +22,38 @@ import org.springframework.web.context.request.WebRequest;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(InvalidDataException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorResponse> handleInvalidDataException(
+            InvalidDataException ex,
+            WebRequest request
+    ) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                INVALID_DATA,
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+        log.error("INVALID_DATA: {}", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BudgetLimitExceededException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST) // Или HttpStatus.BAD_REQUEST
+    public ResponseEntity<ErrorResponse> handleBudgetLimitExceededException(
+            BudgetLimitExceededException ex,
+            WebRequest request
+    ) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(), // 422
+                "Budget Limit Exceeded",
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+        log.error("Budget limit exceeded: {}", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -81,11 +114,11 @@ public class GlobalExceptionHandler {
             WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
-                "Invalid Data",
+                INVALID_DATA,
                 ex.getMessage(),
                 request.getDescription(false)
         );
-        log.error("Invalid data: {}", ex.getMessage());
+        log.error("Error: {}", ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
@@ -96,11 +129,11 @@ public class GlobalExceptionHandler {
             WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
-                "Invalid Data",
+                INVALID_DATA,
                 ex.getMessage(),
                 request.getDescription(false)
         );
-        log.error("Invalid data: {}", ex.getMessage());
+        log.error("{}: {}", INVALID_DATA, ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 

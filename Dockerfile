@@ -23,7 +23,7 @@ FROM eclipse-temurin:21-jre
 WORKDIR /app
 
 COPY --from=builder /app/build/libs/*.jar app.jar
-ENV PORT=10000
+
 EXPOSE $PORT
 ENTRYPOINT ["java", "-jar", "app.jar"]
 #ENTRYPOINT ["sh", "-c", "echo '--- Environment Variables ---' && printenv && echo '--- Directory /app Listing ---' && ls -l /app && echo '--- Java Version ---' && java -version && echo '--- Sleeping forever (kill manually or redeploy) ---' && sleep infinity"]

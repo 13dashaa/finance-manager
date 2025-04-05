@@ -8,7 +8,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,8 +21,8 @@ public class Goal {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
-    private BigDecimal targetAmount;
-    private BigDecimal currentAmount = BigDecimal.ZERO;
+    private double targetAmount;
+    private double currentAmount = 0;
     private LocalDate startDate;
     private LocalDate endDate;
     @ManyToOne(fetch = FetchType.LAZY)

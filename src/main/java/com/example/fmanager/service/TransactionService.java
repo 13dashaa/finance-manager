@@ -6,12 +6,15 @@ import static com.example.fmanager.exception.NotFoundMessages.TRANSACTION_NOT_FO
 
 import com.example.fmanager.dto.TransactionCreateDto;
 import com.example.fmanager.dto.TransactionGetDto;
+import com.example.fmanager.exception.BudgetLimitExceededException;
 import com.example.fmanager.exception.InvalidDataException;
 import com.example.fmanager.exception.NotFoundException;
 import com.example.fmanager.models.Account;
+import com.example.fmanager.models.Budget;
 import com.example.fmanager.models.Category;
 import com.example.fmanager.models.Transaction;
 import com.example.fmanager.repository.AccountRepository;
+import com.example.fmanager.repository.BudgetRepository;
 import com.example.fmanager.repository.CategoryRepository;
 import com.example.fmanager.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
@@ -25,15 +28,18 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
     private final CategoryRepository categoryRepository;
+    private final BudgetRepository budgetRepository;
     private final InMemoryCache cache;
 
     public TransactionService(TransactionRepository transactionsRepository,
                               AccountRepository accountRepository,
                               InMemoryCache cache,
-                              CategoryRepository categoryRepository) {
+                              CategoryRepository categoryRepository,
+                              BudgetRepository budgetRepository) {
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionsRepository;
         this.categoryRepository = categoryRepository;
+        this.budgetRepository = budgetRepository;
         this.cache = cache;
     }
 
@@ -72,32 +78,59 @@ public class TransactionService {
         return Optional.of(TransactionGetDto.convertToDto(transaction));
     }
 
+    @Transactional
     public Transaction createTransaction(TransactionCreateDto transactionCreateDto) {
+        // 1. Создаем и валидируем транзакцию
         Transaction transaction = new Transaction();
         transaction.setDate(transactionCreateDto.getDate());
         transaction.setDescription(transactionCreateDto.getDescription());
-        Account transactionalAccount = accountRepository
-                .findById(transactionCreateDto.getAccountId())
-                .orElseThrow(() -> new RuntimeException(ACCOUNT_NOT_FOUND_MESSAGE));
-        if (transactionalAccount.getBalance() + transactionCreateDto.getAmount() < 0) {
-            throw new InvalidDataException(
-                    "Insufficient funds: transaction would result in negative balance"
-            );
+
+        Account account = accountRepository.findById(transactionCreateDto.getAccountId())
+                .orElseThrow(() -> new NotFoundException(ACCOUNT_NOT_FOUND_MESSAGE));
+
+        // 2. Проверяем баланс счета (для расходных операций)
+        if (account.getBalance() + transactionCreateDto.getAmount() < 0) {
+            throw new InvalidDataException("Insufficient funds in the account");
         }
+
         transaction.setAmount(transactionCreateDto.getAmount());
-        transactionalAccount.setBalance(
-                transactionalAccount.getBalance() + transaction.getAmount()
-        );
-        accountRepository.save(transactionalAccount);
-        transaction.setAccount(transactionalAccount);
+        account.setBalance(account.getBalance() + transaction.getAmount());
+        accountRepository.save(account);
+        transaction.setAccount(account);
+
         Category category = categoryRepository.findById(transactionCreateDto.getCategoryId())
-                .orElseThrow(() -> new RuntimeException(CATEGORY_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new NotFoundException(CATEGORY_NOT_FOUND_MESSAGE));
         transaction.setCategory(category);
+
+        // 3. Для расходов: пробуем обновить бюджеты (если они есть)
+        if (transaction.getAmount() < 0) {
+            List<Budget> budgets = budgetRepository.findByCategoryIdAndClientId(
+                    category.getId(),
+                    account.getClient().getId()
+            );
+
+            // Не кидаем ошибку если бюджетов нет - просто пропускаем
+            for (Budget budget : budgets) {
+                double newAvailableSum = budget.getAvailableSum() + transaction.getAmount();
+
+                if (newAvailableSum >= 0) {
+                    budget.setAvailableSum(newAvailableSum);
+                    budgetRepository.save(budget);
+                } else {
+                    throw new BudgetLimitExceededException(
+                    String.format("Budget limit '%s' exceeded! Available: %.2f, required: %.2f",
+                                    budget.getCategory().getName(),
+                                    budget.getAvailableSum(),
+                                    Math.abs(transaction.getAmount()))
+                    );
+                }
+            }
+        }
+
+        // 4. Сохраняем транзакцию
         Transaction savedTransaction = transactionRepository.save(transaction);
-        Account account = accountRepository.findById(transaction.getAccount().getId())
-                .orElseThrow(() -> new IllegalArgumentException(ACCOUNT_NOT_FOUND_MESSAGE));
-        clearCacheForClientAndCategory(account.getClient().getId(),
-               savedTransaction.getCategory().getId());
+        clearCacheForClientAndCategory(account.getClient().getId(), category.getId());
+
         return savedTransaction;
     }
 

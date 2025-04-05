@@ -5,6 +5,8 @@ import static com.example.fmanager.exception.NotFoundMessages.GOAL_NOT_FOUND_MES
 
 import com.example.fmanager.dto.GoalCreateDto;
 import com.example.fmanager.dto.GoalGetDto;
+import com.example.fmanager.dto.TransactionCreateDto;
+import com.example.fmanager.exception.InvalidDataException;
 import com.example.fmanager.exception.NotFoundException;
 import com.example.fmanager.models.Client;
 import com.example.fmanager.models.Goal;
@@ -21,13 +23,41 @@ public class GoalService {
     private final GoalRepository goalRepository;
     private final InMemoryCache cache;
     private final ClientRepository clientRepository;
+    private final TransactionService transactionService; // Инжектируем TransactionService
 
     public GoalService(GoalRepository goalRepository,
                        InMemoryCache cache,
-                       ClientRepository clientRepository) {
+                       ClientRepository clientRepository,
+                       TransactionService transactionService) {
         this.goalRepository = goalRepository;
+        this.transactionService = transactionService;
         this.cache = cache;
         this.clientRepository = clientRepository;
+    }
+
+    @Transactional
+    public GoalGetDto addFundsToGoal(int goalId, TransactionCreateDto transactionDto) {
+        if (transactionDto.getAmount() <= 0) {
+            throw new InvalidDataException("Amount to save must be positive.");
+        }
+        if (transactionDto.getAccountId() == null || transactionDto.getCategoryId() == null) {
+            throw new InvalidDataException("AccountId and CategoryId are required.");
+        }
+        double amountToAddToGoal = Math.abs(transactionDto.getAmount());
+        TransactionCreateDto actualTransactionDto = new TransactionCreateDto();
+        actualTransactionDto.setAccountId(transactionDto.getAccountId());
+        actualTransactionDto.setCategoryId(transactionDto.getCategoryId());
+        actualTransactionDto.setDate(transactionDto.getDate());
+        actualTransactionDto.setDescription(transactionDto.getDescription());
+        actualTransactionDto.setAmount(-amountToAddToGoal);
+        Goal goal = goalRepository.findById(goalId)
+                .orElseThrow(() -> new NotFoundException(GOAL_NOT_FOUND_MESSAGE));
+        transactionService.createTransaction(actualTransactionDto);
+        double currentAmount = goal.getCurrentAmount() != 0 ? goal.getCurrentAmount() : 0.0;
+        goal.setCurrentAmount(currentAmount + amountToAddToGoal);
+        Goal updatedGoal = goalRepository.save(goal);
+        clearCacheForClient(updatedGoal.getClient().getId());
+        return GoalGetDto.convertToDto(updatedGoal);
     }
 
     public Optional<GoalGetDto> getGoalById(int id) {

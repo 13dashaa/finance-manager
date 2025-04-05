@@ -1,8 +1,8 @@
 package com.example.fmanager.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import com.example.fmanager.dto.TransactionCreateDto;
 import com.example.fmanager.dto.TransactionGetDto;
 import com.example.fmanager.exception.NotFoundException;
@@ -13,15 +13,24 @@ import com.example.fmanager.models.Transaction;
 import com.example.fmanager.repository.AccountRepository;
 import com.example.fmanager.repository.CategoryRepository;
 import com.example.fmanager.repository.TransactionRepository;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TransactionServiceTest {
@@ -110,6 +119,7 @@ class TransactionServiceTest {
         assertNotNull(result);
         assertEquals(savedTransaction.getAmount(), result.getAmount());
     }
+
     @Test
     void getAllTransactions_Success() {
         Transaction transaction2 = new Transaction();

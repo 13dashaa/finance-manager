@@ -16,7 +16,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
             + "WHERE cl.id = :clientId "
             + "AND ct.id = :categoryId")
     List<Transaction> findAllByClientIdAndCategoryId(@Param("clientId") int clientId,
-                                                      @Param("categoryId") int categoryId);
+                                                     @Param("categoryId") int categoryId);
 }
 
 

@@ -1,23 +1,30 @@
 package com.example.fmanager.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import com.example.fmanager.dto.ClientCreateDto;
 import com.example.fmanager.dto.ClientGetDto;
 import com.example.fmanager.dto.ClientUpdateDto;
 import com.example.fmanager.exception.NotFoundException;
 import com.example.fmanager.models.Client;
 import com.example.fmanager.repository.ClientRepository;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ClientServiceTest {
@@ -68,7 +75,7 @@ class ClientServiceTest {
         assertThrows(NotFoundException.class, () -> clientService.findById(1));
     }
 
-  @Test
+    @Test
     void createUser_ShouldSaveAndReturnClient() {
         ClientCreateDto dto = new ClientCreateDto("newuser", "newpass", "new@example.com");
         Client newClient = new Client();
