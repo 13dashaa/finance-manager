@@ -1,7 +1,5 @@
 package com.example.fmanager.service;
 
-
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -57,7 +55,7 @@ class GoalServiceTest {
         goal = new Goal();
         goal.setId(1);
         goal.setName("Save for vacation");
-        goal.setTargetAmount(BigDecimal.valueOf(5000));
+        goal.setTargetAmount(5000);
         goal.setClient(client);
     }
 
@@ -102,7 +100,7 @@ class GoalServiceTest {
     void createGoal_Success() {
         GoalCreateDto createDto = new GoalCreateDto(
                 "Save for vacation",
-                BigDecimal.valueOf(10000),
+                10000,
                 LocalDate.now(),
                 LocalDate.now().plusYears(1),
                 1);
@@ -118,7 +116,7 @@ class GoalServiceTest {
 
     @Test
     void updateGoal_Success() {
-        GoalCreateDto updateDto = new GoalCreateDto("Save for house", BigDecimal.valueOf(20000), LocalDate.now(), LocalDate.now().plusYears(2), 1);
+        GoalCreateDto updateDto = new GoalCreateDto("Save for house", 20000, LocalDate.now(), LocalDate.now().plusYears(2), 1);
         when(goalRepository.findById(1)).thenReturn(Optional.of(goal));
         when(goalRepository.save(any(Goal.class))).thenReturn(goal);
 

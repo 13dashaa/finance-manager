@@ -1,4 +1,41 @@
+version: '3.8'
+
 services:
+  backend:
+    container_name: finance-manager-backend
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+
+      SPRING_PROFILES_ACTIVE: docker
+
+    volumes:
+      - ./logs:/app/logs # Монтирование логов
+    networks:
+      - finance-network
+    depends_on:
+      db: # Указываем, что backend зависит от db
+        condition: service_healthy # Ждать, пока healthcheck базы данных не пройдет успешно
+
+  frontend:
+    container_name: finance-manager-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - finance-network
+
   db:
     image: postgres:15
     container_name: postgres-db
@@ -15,20 +52,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - finance-network
 
-  app:
-    build: .
-    container_name: finance-manager-app
-    ports:
-      - "8080:8080"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB_NAME}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO:-update}
-    depends_on:
-      db:
-        condition: service_healthy
+networks:
+  finance-network:
+    driver: bridge
 
 volumes:
   db-data:
