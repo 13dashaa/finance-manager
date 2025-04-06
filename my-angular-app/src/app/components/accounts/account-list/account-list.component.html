@@ -48,7 +48,7 @@
 
 <div *ngIf="showAddEditForm" class="add-form-container card">
   <h5 class="card-header">
-    {{ isEditMode ? 'Edit Account (ID: ' + currentAccountId + ')' : 'Add New Account' }}
+    {{ isEditMode ? 'Edit Account (' + currentAccountId + ')' : 'Add New Account' }}
   </h5>
 
   <form (ngSubmit)="onSubmit()" [formGroup]="accountForm" class="card-body" novalidate>
@@ -131,8 +131,7 @@
       </ng-container>
 
       <div *ngIf="isEditMode" class="form-control-plaintext ps-2">
-        ID: {{ accountForm.getRawValue().clientId }}
-        <span class="text-muted">({{ getClientUsername(accountForm.getRawValue().clientId) }})</span>
+        {{ getClientUsername(accountForm.getRawValue().clientId) }}
         <br><small class="text-muted fst-italic">(Client cannot be changed after account creation)</small>
       </div>
     </div>

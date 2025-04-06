@@ -1,0 +1,21 @@
+# Этап 1: Сборка Angular
+FROM node:18 AS angular-build
+WORKDIR /app
+COPY my-angular-app/ ./my-angular-app
+WORKDIR /app/my-angular-app
+RUN npm install
+RUN npm run build -- --configuration production
+
+# Этап 2: Сборка Spring Boot
+FROM gradle:8.5-jdk17 AS gradle-build
+COPY --from=angular-build /app/my-angular-app/dist/ /app/src/main/resources/static/
+COPY . /app
+WORKDIR /app
+RUN gradle build -x test
+
+# Этап 3: Финальный образ
+FROM eclipse-temurin:17-jdk-alpine
+WORKDIR /app
+COPY --from=gradle-build /app/build/libs/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
